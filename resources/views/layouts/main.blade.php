@@ -37,9 +37,9 @@
     @if (Route::has('login'))
         <nav class="flex items-center justify-end gap-4">
             {{-- Links fixos --}}
-            <a href="{{ url('/livros') }}" class="inline-block px-5 py-1.5 border border-transparent hover:border-[#19140035] rounded-sm text-[#1b1b18] text-sm leading-normal">Livros</a>
-            <a href="{{ url('/autores') }}" class="inline-block px-5 py-1.5 border border-transparent hover:border-[#19140035] rounded-sm text-[#1b1b18] text-sm leading-normal">Autores</a>
-            <a href="{{ url('/editoras') }}" class="inline-block px-5 py-1.5 border border-transparent hover:border-[#19140035] rounded-sm text-[#1b1b18] text-sm leading-normal">Editoras</a>
+            <a href="/livros/create" class="inline-block px-5 py-1.5 border border-transparent hover:border-[#19140035] rounded-sm text-[#1b1b18] text-sm leading-normal">Livros</a>
+            <a href="/autores/create" class="inline-block px-5 py-1.5 border border-transparent hover:border-[#19140035] rounded-sm text-[#1b1b18] text-sm leading-normal">Autores</a>
+            <a href="/editoras/create" class="inline-block px-5 py-1.5 border border-transparent hover:border-[#19140035] rounded-sm text-[#1b1b18] text-sm leading-normal">Editoras</a>
 
             {{-- Login / Register --}}
             @auth

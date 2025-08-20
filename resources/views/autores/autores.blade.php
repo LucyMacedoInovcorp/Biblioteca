@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'BibliON')
+@section('title', 'Autores')
 
 @section('content')
 <h1>Autores</h1>
