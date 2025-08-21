@@ -6,7 +6,9 @@
 
         <title>@yield('title')</title>
 
-        <!-- Fonts -->
+            <!-- Aqui vai o Vite -->
+            @vite('resources/css/app.css')
+            @vite('resources/js/app.js')
 
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet">
