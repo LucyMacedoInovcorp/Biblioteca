@@ -12,8 +12,8 @@
     @csrf
 
     <div>
-      <label for="image" class="block text-gray-700 font-medium mb-1">Imagem do Livro:</label>
-      <input type="file" id="image" name="image" class="block w-full text-gray-700 border border-gray-300 rounded p-2">
+      <label for="imagemcapa" class="block text-gray-700 font-medium mb-1">Imagem do Livro:</label>
+      <input type="file" id="imagemcapa" name="imagemcapa" class="block w-full text-gray-700 border border-gray-300 rounded p-2">
     </div>
 
     <div>
@@ -79,14 +79,13 @@
         @foreach($livros as $livro)
         <tr class="hover:bg-gray-50">
             <td class="px-4 py-2 border">
-                <img src="{{ $livro->imagemcapa }}" alt="{{ $livro->Nome }}" class="w-16 h-20 object-cover rounded">
+                <img src="{{ $livro->imagemcapa }}" alt="{{ $livro->nome }}" class="w-12 h-12 object-cover rounded">
             </td>
             <td class="px-4 py-2 border">{{ $livro->nome }}</td>
             <td class="px-4 py-2 border">{{ $livro->ISBN }}</td>
             <td class="px-4 py-2 border">{{ $livro->bibliografia }}</td>
             <td class="px-4 py-2 border">{{ $livro->preco }}</td>
-            <td class="px-4 py-2 border">
-                <a href="#" class="text-blue-500 hover:underline">Saber mais</a>
+            <td class="px-4 py-2 border">                
             </td>
         </tr>
         @endforeach

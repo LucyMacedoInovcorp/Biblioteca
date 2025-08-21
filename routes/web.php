@@ -11,13 +11,16 @@ Route::get('/', function () {
 // Livros
 Route::get('/livros/create', [BibliController::class, 'createLivro']);
 //Formulário de novo livro
-Route::post('/livros', [BibliController::class, 'store']);
+Route::post('/livros', [BibliController::class, 'storeLivro']);
 
 // Autores
 Route::get('/autores/create', [BibliController::class, 'createAutor']);
+//Formulário de novo livro
+Route::post('/autores', [BibliController::class, 'storeAutor']);
 
 // Editoras
 Route::get('/editoras/create', [BibliController::class, 'createEditora']);
+Route::post('/editoras', [BibliController::class, 'storeEditora']);
 
 
 
