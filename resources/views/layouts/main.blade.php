@@ -86,42 +86,48 @@
   <script src="https://cdn.datatables.net/buttons/3.2.4/js/buttons.html5.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/3.2.4/js/buttons.print.min.js"></script>
 
-<script>
-  $(document).ready(function () {
-    var table = $('.myTable').DataTable({
-      dom: 'Bfrtip',
-      buttons: [
-        {
+  <script>
+    $(document).ready(function() {
+      var table = $('.myTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: [{
           extend: 'excelHtml5',
           text: 'Exportar Excel'
+        }],
+        language: {
+          url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
         }
-      ]
-    });
 
-    // Pega os nomes das colunas (THs)
-    table.columns().every(function () {
-      var column = this;
-      var headerText = $(column.header()).text();
-      $('#colSelect').append(
-        $('<option>', { value: column.index() }).text(headerText)
-      );
-    });
+      });
 
-    // Evento de mudança no select
-    $('#colSelect').on('change', function () {
-      var val = $(this).val();
 
-      if (val === "all") {
-        // Mostra todas
-        table.columns().visible(true);
-      } else {
-        // Esconde todas e mostra apenas a escolhida
-        table.columns().visible(false);
-        table.column(val).visible(true);
-      }
+
+      // Pega os nomes das colunas (THs)
+      table.columns().every(function() {
+        var column = this;
+        var headerText = $(column.header()).text();
+        $('#colSelect').append(
+          $('<option>', {
+            value: column.index()
+          }).text(headerText)
+        );
+      });
+
+      // Evento de mudança no select
+      $('#colSelect').on('change', function() {
+        var val = $(this).val();
+
+        if (val === "all") {
+          // Mostra todas
+          table.columns().visible(true);
+        } else {
+          // Esconde todas e mostra apenas a escolhida
+          table.columns().visible(false);
+          table.column(val).visible(true);
+        }
+      });
     });
-  });
-</script>
+  </script>
 
 
 
