@@ -3,23 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Livro; 
-use App\Models\Autor; 
-use App\Models\Editora; 
+use App\Models\Livro;
+use App\Models\Autor;
+use App\Models\Editora;
 
 class BibliController extends Controller
 {
-public function indexLivros()
-{
-    return view('welcome');
-}
+    public function indexLivros()
+    {
+        return view('welcome');
+    }
 
 
     public function createLivro()
     {
         $livros = Livro::all();
         $editoras = Editora::orderBy('nome')->get();
-        return view('livros.livros', ['livros' => $livros], ['editoras' => $editoras]);
+        $livros = Livro::with(['editora', 'autores'])->get();
+
+        $editoras = Editora::all();
+        $autores = Autor::all();
+        return view('livros.livros', compact('livros', 'editoras', 'autores'));
     }
 
     public function createAutor()
@@ -36,13 +40,14 @@ public function indexLivros()
 
 
     //Requisição do formulário para inserir novo livro
-public function storeLivro(Request $request){
+    public function storeLivro(Request $request)
+    {
         $livro = new Livro;
         $livro->nome         = $request->nome;
         $livro->ISBN         = $request->ISBN;
         $livro->bibliografia = $request->bibliografia;
         $livro->preco        = $request->preco;
-        $livro->editora_id   = $request->editora_id; 
+        $livro->editora_id   = $request->editora_id;
 
         if ($request->hasFile('imagemcapa')) {
             $path = $request->file('imagemcapa')->store('images', 'public');
@@ -51,39 +56,43 @@ public function storeLivro(Request $request){
 
         $livro->save();
 
+        if ($request->filled('autores')) {
+            $livro->autores()->sync($request->autores);
+        }
+
         return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
     }
 
-//Requisição do formulário para inserir novo Autor
-public function storeAutor(Request $request){
-    $autor = new Autor;
-    $autor->nome = $request->nome;
+    //Requisição do formulário para inserir novo Autor
+    public function storeAutor(Request $request)
+    {
+        $autor = new Autor;
+        $autor->nome = $request->nome;
 
-    if ($request->hasFile('foto')) {
-       
-        $path = $request->file('foto')->store('images', 'public');
-        $autor->foto = '/storage/' . $path;
+        if ($request->hasFile('foto')) {
+
+            $path = $request->file('foto')->store('images', 'public');
+            $autor->foto = '/storage/' . $path;
+        }
+
+        $autor->save();
+
+        return redirect('/autores/create')->with('msg', 'Novo autor adicionado com sucesso!');
     }
 
-    $autor->save();
+    //Requisição do formulário para inserir nova editora
+    public function storeEditora(Request $request)
+    {
+        $editora = new Editora;
+        $editora->nome = $request->nome;
 
-    return redirect('/autores/create')->with('msg', 'Novo autor adicionado com sucesso!');
-}
+        if ($request->hasFile('logotipo')) {
+            $path = $request->file('logotipo')->store('images', 'public');
+            $editora->logotipo = '/storage/' . $path;
+        }
 
-//Requisição do formulário para inserir nova editora
-public function storeEditora(Request $request){
-    $editora = new Editora;
-    $editora->nome = $request->nome;
+        $editora->save();
 
-    if ($request->hasFile('logotipo')) {
-        $path = $request->file('logotipo')->store('images', 'public');
-        $editora->logotipo = '/storage/' . $path; 
+        return redirect('/editoras/create')->with('msg', 'Nova editora adicionada com sucesso!');
     }
-
-    $editora->save(); 
-
-    return redirect('/editoras/create')->with('msg', 'Nova editora adicionada com sucesso!');
-}
-
-
 }

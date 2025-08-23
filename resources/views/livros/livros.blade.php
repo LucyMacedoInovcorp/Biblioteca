@@ -48,6 +48,17 @@
       </select>
     </div>
 
+    <div>
+      <label for="autores" class="block text-gray-700 font-medium mb-1">Autores:</label>
+      <select id="autores" name="autores[]"
+        class="block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        multiple required>
+        @foreach($autores as $autor)
+        <option value="{{ $autor->id }}">{{ $autor->nome }}</option>
+        @endforeach
+      </select>
+      <small class="text-gray-500">Segure CTRL (ou CMD no Mac) para selecionar vários autores</small>
+    </div>
 
 
     <div class="flex justify-center">
@@ -94,7 +105,7 @@
         <th class="px-4 py-2 border">Bibliografia</th>
         <th class="px-4 py-2 border">Preço</th>
         <th class="px-4 py-2 border">Editora</th>
-
+        <th class="px-4 py-2 border">Autores</th>
       </tr>
     </thead>
     <tbody>
@@ -108,6 +119,12 @@
         <td class="px-4 py-2 border">{{ $livro->bibliografia }}</td>
         <td class="px-4 py-2 border">{{ $livro->preco }}</td>
         <td class="px-4 py-2 border">{{ $livro->editora->nome ?? 'Sem editora' }}</td>
+        <td class="px-4 py-2 border">
+          @if($livro->autores->isNotEmpty())
+          {{ $livro->autores->pluck('nome')->join(', ') }}
+          @else
+          <span class="text-gray-500">Sem autor</span>
+          @endif
       </tr>
       @endforeach
     </tbody>
