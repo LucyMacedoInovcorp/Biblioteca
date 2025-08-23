@@ -49,7 +49,7 @@ public function storeLivro(Request $request){
 
     $livro->save();
 
-    return redirect('/livros/create');
+    return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
 }
 
 //Requisição do formulário para inserir novo Autor
@@ -65,7 +65,7 @@ public function storeAutor(Request $request){
 
     $autor->save();
 
-    return redirect('/autores/create');
+    return redirect('/autores/create')->with('msg', 'Novo autor adicionado com sucesso!');
 }
 
 //Requisição do formulário para inserir nova editora
@@ -80,7 +80,7 @@ public function storeEditora(Request $request){
 
     $editora->save(); 
 
-    return redirect('/editoras/create');
+    return redirect('/editoras/create')->with('msg', 'Nova editora adicionada com sucesso!');
 }
 
 

@@ -64,7 +64,8 @@
     <h2 class="text-xl font-semibold mb-1">Livros</h2>
     <p class="text-gray-600 mb-4">Acervo BibliON</p>
 
-<table class="min-w-full border border-gray-200">
+
+<table class="datatable min-w-full border border-gray-200 myTable">
     <thead class="bg-gray-100">
         <tr>
             <th class="px-4 py-2 border">Imagem</th> 
@@ -72,7 +73,7 @@
             <th class="px-4 py-2 border">ISBN</th>
             <th class="px-4 py-2 border">Bibliografia</th>
             <th class="px-4 py-2 border">Preço</th>
-            <th class="px-4 py-2 border">Ações</th>
+            
         </tr>
     </thead>
     <tbody>
@@ -85,12 +86,11 @@
             <td class="px-4 py-2 border">{{ $livro->ISBN }}</td>
             <td class="px-4 py-2 border">{{ $livro->bibliografia }}</td>
             <td class="px-4 py-2 border">{{ $livro->preco }}</td>
-            <td class="px-4 py-2 border">                
-            </td>
         </tr>
         @endforeach
     </tbody>
 </table>
+
 
 </div>
 
