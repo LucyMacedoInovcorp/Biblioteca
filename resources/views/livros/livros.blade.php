@@ -64,6 +64,13 @@
     <h2 class="text-xl font-semibold mb-1">Livros</h2>
     <p class="text-gray-600 mb-4">Acervo BibliON</p>
 
+<div class="mb-4">
+  <label for="colSelect" class="mr-2 font-medium">Filtrar coluna:</label>
+  <select id="colSelect" class="border p-2 rounded">
+    <option value="all">Todas</option>
+  </select>
+</div>
+
 
 <table class="datatable min-w-full border border-gray-200 myTable">
     <thead class="bg-gray-100">
