@@ -18,7 +18,8 @@ public function indexLivros()
     public function createLivro()
     {
         $livros = Livro::all();
-        return view('livros.livros', ['livros' => $livros]);
+        $editoras = Editora::orderBy('nome')->get();
+        return view('livros.livros', ['livros' => $livros], ['editoras' => $editoras]);
     }
 
     public function createAutor()
@@ -36,21 +37,22 @@ public function indexLivros()
 
     //Requisição do formulário para inserir novo livro
 public function storeLivro(Request $request){
-    $livro = new Livro;
-    $livro->nome = $request->nome;
-    $livro->ISBN = $request->ISBN;
-    $livro->bibliografia = $request->bibliografia;
-    $livro->preco = $request->preco;
+        $livro = new Livro;
+        $livro->nome         = $request->nome;
+        $livro->ISBN         = $request->ISBN;
+        $livro->bibliografia = $request->bibliografia;
+        $livro->preco        = $request->preco;
+        $livro->editora_id   = $request->editora_id; 
 
-    if ($request->hasFile('imagemcapa')) {
-        $path = $request->file('imagemcapa')->store('images', 'public');
-        $livro->imagemcapa = '/storage/' . $path;
+        if ($request->hasFile('imagemcapa')) {
+            $path = $request->file('imagemcapa')->store('images', 'public');
+            $livro->imagemcapa = '/storage/' . $path;
+        }
+
+        $livro->save();
+
+        return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
     }
-
-    $livro->save();
-
-    return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
-}
 
 //Requisição do formulário para inserir novo Autor
 public function storeAutor(Request $request){

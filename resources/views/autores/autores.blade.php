@@ -47,10 +47,10 @@
 </div>
 
 <div id="autores-container" class="w-full p-4">
-    <h2 class="text-xl font-semibold mb-1">Livros</h2>
+    <h2 class="text-xl font-semibold mb-1">Autores</h2>
     <p class="text-gray-600 mb-4">Acervo BibliON</p>
 
-<table class="min-w-full border border-gray-200">
+<table class="min-w-full border border-gray-200 myTable">
     <thead class="bg-gray-100">
         <tr>
             <th class="px-4 py-2 border">Imagem</th> 

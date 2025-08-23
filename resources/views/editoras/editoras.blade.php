@@ -16,7 +16,7 @@
 
     <div>
       <label for="nome" class="block text-gray-700 font-medium mb-1">Nome da editora:</label>
-      <input type="text" id="nome" name="nome" placeholder="Nome do autor" class="block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input type="text" id="nome" name="nome" placeholder="Nome da editora" class="block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
 
@@ -43,14 +43,14 @@
 </div>
 
 <div id="editoras-container" class="w-full p-4">
-    <h2 class="text-xl font-semibold mb-1">Livros</h2>
+    <h2 class="text-xl font-semibold mb-1">Editoras</h2>
     <p class="text-gray-600 mb-4">Acervo BibliON</p>
 
-<table class="min-w-full border border-gray-200">
+<table class="min-w-full border border-gray-200 myTable">
     <thead class="bg-gray-100">
         <tr>
             <th class="px-4 py-2 border">Logotipo</th> 
-            <th class="px-4 py-2 border">Nome</th>
+            <th class="px-4 py-2 border">Editora</th>
 
         </tr>
     </thead>
