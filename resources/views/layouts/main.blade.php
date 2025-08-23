@@ -14,6 +14,8 @@
 
   <!-- DataTables -->
   <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet">
+  <!-- DataTables Botões-->
+  <link href="https://cdn.datatables.net/buttons/3.2.4/css/buttons.dataTables.min.css" rel="stylesheet" integrity="sha384-CEGjJEAUOa45Jz9PQsvKuOUrsy4B/1nuiBPCJWCO8JkPbziwbjZV+vqPsHc1wA7z" crossorigin="anonymous">
 
   <!-- Vite -->
   @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
@@ -74,19 +76,28 @@
   <footer>BiblyON &copy; 2025</footer>
 
 
-  <!-- DataTables-->
+  <!-- Dependências do DataTables -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
   <script src="{{ asset('js/datatables.min.js') }}"></script>
 
+  <!-- Extensões dos botões -->
+  <script src="https://cdn.datatables.net/buttons/3.2.4/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.2.4/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.2.4/js/buttons.print.min.js"></script>
+
   <script>
-  $(document).ready(function() {
-    $('.myTable').DataTable({
-      select: true
+    $(document).ready(function() {
+      $('.myTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: [{
+          extend: 'excelHtml5',
+          text: 'Exportar Excel'
+        }]
+      });
     });
-  });
-  
-</script>
+  </script>
+
 
 </body>
 
