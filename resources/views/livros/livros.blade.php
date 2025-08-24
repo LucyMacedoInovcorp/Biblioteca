@@ -74,8 +74,11 @@
 --}}
 
 <div id="livros-container" class="w-full p-4">
-  <h2 class="text-xl font-semibold mb-1">Livros</h2>
-  <p class="text-gray-600 mb-4">Acervo BibliON</p>
+  <h2 class="text-xl font-semibold mb-1 text-blue-100 text-stroke tracking-wider">
+    Acervo de Livros
+  </h2>
+</div>
+
 
   <div class="mb-4">
     <label for="colSelect" class="mr-2 font-medium">Filtrar coluna:</label>
@@ -84,31 +87,32 @@
     </select>
   </div>
 
+    <div class="mt-6">
+   <table class="table table-zebra w-full myTable border-gray-200 border-separate border-spacing-0">
 
-  <table class="datatable min-w-full border border-gray-200 myTable">
-    <thead class="bg-gray-100">
+    <thead class="bg-blue-100">
       <tr>
-        <th class="px-4 py-2 border">Imagem</th>
-        <th class="px-4 py-2 border">Nome</th>
-        <th class="px-4 py-2 border">ISBN</th>
-        <th class="px-4 py-2 border">Bibliografia</th>
-        <th class="px-4 py-2 border">Preço</th>
-        <th class="px-4 py-2 border">Editora</th>
-        <th class="px-4 py-2 border">Autores</th>
+        <th class="px-4 py-2 ">Imagem</th>
+        <th class="px-4 py-2 ">Nome</th>
+        <th class="px-4 py-2 ">ISBN</th>
+        <th class="px-4 py-2 ">Bibliografia</th>
+        <th class="px-4 py-2 ">Preço</th>
+        <th class="px-4 py-2 ">Editora</th>
+        <th class="px-4 py-2 ">Autores</th>
       </tr>
     </thead>
     <tbody>
       @foreach($livros as $livro)
       <tr class="hover:bg-gray-50">
-        <td class="px-4 py-2 border">
+        <td class="px-4 py-2 ">
           <img src="{{ $livro->imagemcapa }}" alt="{{ $livro->nome }}" class="w-12 h-12 object-cover rounded">
         </td>
-        <td class="px-4 py-2 border">{{ $livro->nome }}</td>
-        <td class="px-4 py-2 border">{{ $livro->ISBN }}</td>
-        <td class="px-4 py-2 border">{{ $livro->bibliografia }}</td>
-        <td class="px-4 py-2 border">{{ $livro->preco }}</td>
-        <td class="px-4 py-2 border">{{ $livro->editora->nome ?? 'Sem editora' }}</td>
-        <td class="px-4 py-2 border">
+        <td class="px-4 py-2 text-blue-900">{{ $livro->nome }}</td>
+        <td class="px-4 py-2 text-blue-900">{{ $livro->ISBN }}</td>
+        <td class="px-4 py-2 text-blue-900">{{ $livro->bibliografia }}</td>
+        <td class="px-4 py-2 text-blue-900">{{ $livro->preco }}</td>
+        <td class="px-4 py-2 text-blue-900">{{ $livro->editora->nome ?? 'Sem editora' }}</td>
+        <td class="px-4 py-2 text-blue-900">
           @if($livro->autores->isNotEmpty())
           {{ $livro->autores->pluck('nome')->join(', ') }}
           @else

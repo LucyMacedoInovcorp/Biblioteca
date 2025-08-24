@@ -3,7 +3,8 @@
 @section('title', 'BibliON')
 
 @section('content')
-<h1>Teste</h1>
+
+<img src="{{ asset('images/banner.png') }}" alt="Banner" class="h-30 w-auto">
 
 
 

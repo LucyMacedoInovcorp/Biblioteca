@@ -36,36 +36,40 @@
 
 --}}
 
-  <div class="mb-4">
+<div id="livros-container" class="w-full p-4">
+  <h2 class="text-xl font-semibold mb-1 text-blue-100 text-stroke tracking-wider">
+    Acervo de editoras
+  </h2>
+</div>
+
+
     <label for="colSelect" class="mr-2 font-medium">Filtrar coluna:</label>
     <select id="colSelect" class="border p-2 rounded">
       <option value="all">Todas</option>
     </select>
   </div>
 
-<div id="editoras-container" class="w-full p-4">
-    <h2 class="text-xl font-semibold mb-1">Editoras</h2>
-    <p class="text-gray-600 mb-4">Acervo BibliON</p>
 
-<table class="min-w-full border border-gray-200 myTable">
-    <thead class="bg-gray-100">
-        <tr>
-            <th class="px-4 py-2 border">Logotipo</th> 
-            <th class="px-4 py-2 border">Editora</th>
 
-        </tr>
+  <table class="table table-zebra w-full myTable border-gray-200 border-separate border-spacing-0">
+    <thead class="bg-blue-100">
+      <tr>
+        <th class="px-4 py-2 ">Logotipo</th>
+        <th class="px-4 py-2 ">Editora</th>
+
+      </tr>
     </thead>
     <tbody>
-        @foreach($editoras as $editora)
-        <tr class="hover:bg-gray-50">
-            <td class="px-4 py-2 border">
-                <img src="{{ $editora->logotipo }}" alt="{{ $editora->nome }}" class="w-12 h-12 object-cover rounded">
-            </td>
-            <td class="px-4 py-2 border">{{ $editora->nome }}</td>
-        </tr>
-        @endforeach
+      @foreach($editoras as $editora)
+      <tr class="hover:bg-gray-50">
+        <td class="px-4 py-2 text-blue-900">
+          <img src="{{ $editora->logotipo }}" alt="{{ $editora->nome }}" class="w-12 h-12 object-cover rounded">
+        </td>
+        <td class="px-4 py-2 text-blue-900">{{ $editora->nome }}</td>
+      </tr>
+      @endforeach
     </tbody>
-</table>
+  </table>
 
 </div>
 
