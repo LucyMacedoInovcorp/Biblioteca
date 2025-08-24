@@ -101,9 +101,13 @@
           extend: 'excelHtml5',
           text: 'Exportar Excel'
         }
-      ]
+      ],
+      language: {
+        url: "//cdn.datatables.net/plug-ins/2.2.2/i18n/pt-BR.json"
+      }
     });
-    // Pega os nomes das colunas (THs)
+
+    // Preenche o select com os nomes das colunas
     table.columns().every(function () {
       var column = this;
       var headerText = $(column.header()).text();
@@ -111,20 +115,20 @@
         $('<option>', { value: column.index() }).text(headerText)
       );
     });
-    // Evento de mudança no select
+
+    // Filtro de colunas
     $('#colSelect').on('change', function () {
       var val = $(this).val();
       if (val === "all") {
-        // Mostra todas
         table.columns().visible(true);
       } else {
-        // Esconde todas e mostra apenas a escolhida
         table.columns().visible(false);
         table.column(val).visible(true);
       }
     });
   });
 </script>
+
 
 
 
