@@ -5,6 +5,7 @@
 @section('content')
 
 
+{{--
 <div id="autores-create-container" class="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6">
   <h1 class="text-2xl font-bold mb-4">Registe um novo autor</h1>
 
@@ -34,17 +35,16 @@
   </form>
 </div>
 
+--}}
 
 
+  <div class="mb-4">
+    <label for="colSelect" class="mr-2 font-medium">Filtrar coluna:</label>
+    <select id="colSelect" class="border p-2 rounded">
+      <option value="all">Todas</option>
+    </select>
+  </div>
 
-<div id="search-container" class="w-full p-4">
-    <h1 class="text-2xl font-bold mb-2">Busque um livro</h1>
-    <form action="">
-        <input type="text" id="search" name="search" 
-               class="w-full p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-               placeholder="Procurar...">
-    </form>
-</div>
 
 <div id="autores-container" class="w-full p-4">
     <h2 class="text-xl font-semibold mb-1">Autores</h2>

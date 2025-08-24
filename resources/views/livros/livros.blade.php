@@ -4,7 +4,7 @@
 
 @section('content')
 
-
+{{--
 <div id="livros-create-container" class="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6">
   <h1 class="text-2xl font-bold mb-4">Registe um novo livro</h1>
 
@@ -71,18 +71,7 @@
 
   </form>
 </div>
-
-
-
-
-<div id="search-container" class="w-full p-4">
-  <h1 class="text-2xl font-bold mb-2">Busque um livro</h1>
-  <form action="">
-    <input type="text" id="search" name="search"
-      class="w-full p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      placeholder="Procurar...">
-  </form>
-</div>
+--}}
 
 <div id="livros-container" class="w-full p-4">
   <h2 class="text-xl font-semibold mb-1">Livros</h2>
