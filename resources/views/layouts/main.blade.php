@@ -63,6 +63,9 @@
         <li><a href="/livros/create">Livros</a></li>
         <li><a href="/autores/create">Autores</a></li>
         <li><a href="/editoras/create">Editoras</a></li>
+        @auth
+        <li><a href="{{ route('profile.show') }}">Perfil</a></li>
+        @endauth
 
 
 
