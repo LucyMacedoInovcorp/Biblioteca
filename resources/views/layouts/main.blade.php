@@ -27,21 +27,23 @@
 
 
   <style>
-    *{
+    * {
       font-family: Roboto;
     }
+
     .myTable {
       margin-top: 1.5rem !important;
       margin-bottom: 1.5rem !important;
     }
-      .text-stroke {
-    text-shadow:
-      -1px -1px 0 #1e3a8a,  
-       1px -1px 0 #1e3a8a,
-      -1px  1px 0 #1e3a8a,
-       1px  1px 0 #1e3a8a;
-       margin-bottom: 1.5rem;
-  }
+
+    .text-stroke {
+      text-shadow:
+        -1px -1px 0 #1e3a8a,
+        1px -1px 0 #1e3a8a,
+        -1px 1px 0 #1e3a8a,
+        1px 1px 0 #1e3a8a;
+      margin-bottom: 1.5rem;
+    }
   </style>
 
 </head>
@@ -62,14 +64,32 @@
         <li><a href="/autores/create">Autores</a></li>
         <li><a href="/editoras/create">Editoras</a></li>
 
+
+
         @auth
-        <li><a href="{{ url('/dashboard') }}" class="btn btn-sm btn-outline">Dashboard</a></li>
-        @else
-        <li><a href="{{ route('login') }}">Login</a></li>
-        @if (Route::has('register'))
-        <li><a href="{{ route('register') }}">Register</a></li>
-        @endif
+        <li class="nav-item">
+          <form action="/logout" method="POST">
+            @csrf
+            <a href="/logout"
+              class="nav-link"
+              onclick="event.preventDefault();
+                    this.closest('form').submit();">
+              Sair
+            </a>
+          </form>
+        </li>
         @endauth
+        @guest
+        <li class="nav-item">
+          <a href="/login" class="nav-link">Entrar</a>
+        </li>
+        <li class="nav-item">
+          <a href="/register" class="nav-link">Cadastrar</a>
+        </li>
+        @endguest
+
+
+
       </ul>
     </div>
   </header>
