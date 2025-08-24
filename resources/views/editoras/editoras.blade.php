@@ -5,7 +5,7 @@
 @section('content')
 
 {{--
-<div id="editoras-create-container" class="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6">
+  <div id="editoras-create-container" class="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6">
   <h1 class="text-2xl font-bold mb-4">Registe uma nova editora</h1>
 
   <form action="/editoras" method="POST" enctype="multipart/form-data" class="space-y-4">

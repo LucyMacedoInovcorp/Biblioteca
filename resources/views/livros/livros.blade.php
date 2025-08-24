@@ -5,6 +5,7 @@
 @section('content')
 
 {{--
+
 <div id="livros-create-container" class="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6">
   <h1 class="text-2xl font-bold mb-4">Registe um novo livro</h1>
 
@@ -71,7 +72,9 @@
 
   </form>
 </div>
+
 --}}
+
 
 <div id="livros-container" class="w-full p-4">
   <h2 class="text-xl font-semibold mb-1 text-blue-100 text-stroke tracking-wider">
