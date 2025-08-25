@@ -134,39 +134,82 @@
   <script src="https://cdn.datatables.net/buttons/3.2.4/js/buttons.print.min.js"></script>
 
 
-  <script>
-    $(document).ready(function() {
-      var table = $('.myTable').DataTable({
-        dom: 'Bfrtip',
-        buttons: [{
-          extend: 'excelHtml5',
-          text: 'Exportar Excel'
-        }],
-      });
-
-      // Preenche o select com os nomes das colunas
-      table.columns().every(function() {
-        var column = this;
-        var headerText = $(column.header()).text();
-        $('#colSelect').append(
-          $('<option>', {
-            value: column.index()
-          }).text(headerText)
-        );
-      });
-
-      // Filtro de colunas
-      $('#colSelect').on('change', function() {
-        var val = $(this).val();
-        if (val === "all") {
-          table.columns().visible(true);
-        } else {
-          table.columns().visible(false);
-          table.column(val).visible(true);
+<script>
+  $(document).ready(function () {
+    var table = $('.myTable').DataTable({
+      dom: 'Bfrtip',
+      buttons: [{
+        extend: 'excelHtml5',
+        text: 'Exportar Excel'
+      }],
+      language: {
+        search: 'Pesquisar:',
+        lengthMenu: 'Mostrar _MENU_ registos',
+        zeroRecords: 'Nada encontrado',
+        info: 'Mostrando _START_-_END_ de _TOTAL_',
+        infoEmpty: 'Sem registos',
+        infoFiltered: '(filtrado de _MAX_)',
+        paginate: {
+          first: 'Primeiro',
+          last: 'Último',
+          next: 'Próximo',
+          previous: 'Anterior'
         }
-      });
+      }
     });
-  </script>
+
+    // === Estilização DaisyUI/Tailwind nos controles do DataTables 
+    var $wrapper = $(table.table().container());
+
+    // Campo de pesquisa
+    $wrapper.find('div.dataTables_filter input')
+      .addClass('input input-bordered w-64');
+
+    // Select "Show N entries"
+    $wrapper.find('div.dataTables_length select')
+      .addClass('select select-bordered');
+
+    // Botões (Excel, etc.)
+    $wrapper.find('.dt-buttons .dt-button')
+  .addClass('btn btn-secondary btn-sm mb-4 border border-base-300 shadow-sm hover:border-base-400 hover:bg-base-200')
+  .removeClass('dt-button');
+
+
+
+
+    // Paginação
+    $wrapper.find('.dataTables_paginate')
+      .addClass('join');
+    $wrapper.find('.dataTables_paginate .paginate_button')
+      .addClass('btn btn-sm join-item')
+      .css({ border: 'none', background: 'transparent' }); 
+
+    // Info
+    $wrapper.find('div.dataTables_info')
+      .addClass('text-sm opacity-70');
+
+    //  Preenche o select com os nomes das colunas 
+    table.columns().every(function () {
+      var column = this;
+      var headerText = $(column.header()).text().trim();
+      $('#colSelect').append(
+        $('<option>', { value: column.index() }).text(headerText)
+      );
+    });
+
+    // Filtro de colunas 
+    $('#colSelect').on('change', function () {
+      var val = $(this).val();
+      if (val === "all") {
+        table.columns().visible(true);
+      } else {
+        table.columns().visible(false);
+        table.column(val).visible(true);
+      }
+    });
+  });
+</script>
+
 
 
 

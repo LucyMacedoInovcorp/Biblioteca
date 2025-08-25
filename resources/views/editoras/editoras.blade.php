@@ -4,73 +4,88 @@
 
 @section('content')
 
-{{--
-  <div id="editoras-create-container" class="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6">
-  <h1 class="text-2xl font-bold mb-4">Registe uma nova editora</h1>
+<div id="editoras-create-container" class="max-w-2xl mx-auto mt-10">
+  <div class="card bg-base-100 shadow-xl p-8">
+    <h1 class="text-3xl font-bold mb-6 text-center">🏢 Registe uma nova editora</h1>
 
-  <form action="/editoras" method="POST" enctype="multipart/form-data" class="space-y-4">
-    @csrf
+    <form action="/editoras" method="POST" enctype="multipart/form-data" class="space-y-5">
+      @csrf
 
-    <div>
-      <label for="logotipo" class="block text-gray-700 font-medium mb-1">Logotipo da editora:</label>
-      <input type="file" id="logotipo" name="logotipo" class="block w-full text-gray-700 border border-gray-300 rounded p-2">
-    </div>
+      <!-- Logotipo -->
+      <div class="form-control">
+        <label for="logotipo" class="label">
+          <span class="label-text font-semibold">Logotipo da editora</span>
+        </label>
+        <input type="file" id="logotipo" name="logotipo" class="file-input file-input-bordered w-full" />
+      </div>
 
-    <div>
-      <label for="nome" class="block text-gray-700 font-medium mb-1">Nome da editora:</label>
-      <input type="text" id="nome" name="nome" placeholder="Nome da editora" class="block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+      <!-- Nome -->
+      <div class="form-control">
+        <label for="nome" class="label">
+          <span class="label-text font-semibold">Nome da editora</span>
+        </label>
+        <input type="text" id="nome" name="nome" placeholder="Digite o nome da editora" 
+          class="input input-bordered w-full" />
+      </div>
 
-
-<div class="flex justify-center">
-  <input 
-    type="submit" 
-    value="Incluir editora" 
-    class="bg-red-300 text-black font-semibold py-2 px-4 rounded border-2 border-red-400 hover:bg-red-400 hover:border-red-500 transition duration-300 cursor-pointer"
-  />
-</div>
-
-    
-  </form>
-</div>
-
---}}
-
-<div id="livros-container" class="w-full p-4">
-  <h2 class="text-xl font-semibold mb-1 text-blue-100 text-stroke tracking-wider">
-    Acervo de editoras
-  </h2>
+      <!-- Botão -->
+      <div class="form-control mt-6">
+        <button type="submit" class="btn btn-primary w-full">➕ Incluir editora</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 
-    <label for="colSelect" class="mr-2 font-medium">Filtrar coluna:</label>
-    <select id="colSelect" class="border p-2 rounded">
-      <option value="all">Todas</option>
-    </select>
+<div id="editoras-container" class="w-full p-6">
+  <!-- Título -->
+  <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+    <h2 class="text-3xl font-bold flex items-center gap-2">
+      🏢 Acervo de Editoras
+      <span class="badge badge-primary badge-lg">{{ $editoras->count() ?? 0 }}</span>
+    </h2>
+
+    <!-- Filtro -->
+    <label class="form-control w-64">
+      <div class="label">
+        <span class="label-text font-semibold">Filtrar coluna</span>
+      </div>
+      <select id="colSelect" class="select select-bordered">
+        <option value="all">Todas</option>
+      </select>
+    </label>
   </div>
 
+  <!-- Tabela -->
+  <div class="card bg-base-100 shadow-md mt-10">
+    <div class="card-body p-0">
+      <div class="overflow-x-auto">
+        <table class="myTable table table-zebra w-full">
+          <thead class="bg-base-200">
+            <tr>
+              <th>📷 Logotipo</th>
+              <th>🏢 Nome</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($editoras as $editora)
+              <tr class="hover">
+                <td>
+                  <div class="w-32 h-20 flex items-center justify-center bg-base-200 rounded-md shadow-sm">
+                    <img src="{{ $editora->logotipo }}" alt="{{ $editora->nome }}" 
+                        class="max-h-full max-w-full object-contain">
+                  </div>
 
 
-  <table class="table table-zebra w-full myTable border-gray-200 border-separate border-spacing-0">
-    <thead class="bg-blue-100">
-      <tr>
-        <th class="px-4 py-2 ">Logotipo</th>
-        <th class="px-4 py-2 ">Editora</th>
-
-      </tr>
-    </thead>
-    <tbody>
-      @foreach($editoras as $editora)
-      <tr class="hover:bg-gray-50">
-        <td class="px-4 py-2 text-blue-900">
-          <img src="{{ $editora->logotipo }}" alt="{{ $editora->nome }}" class="w-12 h-12 object-cover rounded">
-        </td>
-        <td class="px-4 py-2 text-blue-900">{{ $editora->nome }}</td>
-      </tr>
-      @endforeach
-    </tbody>
-  </table>
-
+                </td>
+                <td class="font-semibold text-primary">{{ $editora->nome }}</td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 @endsection

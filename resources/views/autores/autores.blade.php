@@ -4,74 +4,84 @@
 
 @section('content')
 
+<div id="autores-create-container" class="max-w-2xl mx-auto mt-10">
+  <div class="card bg-base-100 shadow-xl p-8">
+    <h1 class="text-3xl font-bold mb-6 text-center">👤 Registe um novo autor</h1>
 
-{{--
-<div id="autores-create-container" class="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6">
-  <h1 class="text-2xl font-bold mb-4">Registe um novo autor</h1>
+    <form action="/autores" method="POST" enctype="multipart/form-data" class="space-y-5">
+      @csrf
 
-  <form action="/autores" method="POST" enctype="multipart/form-data" class="space-y-4">
-    @csrf
+      <!-- Foto -->
+      <div class="form-control">
+        <label for="foto" class="label">
+          <span class="label-text font-semibold">Imagem do autor</span>
+        </label>
+        <input type="file" id="foto" name="foto" class="file-input file-input-bordered w-full" />
+      </div>
 
-    <div>
-      <label for="foto" class="block text-gray-700 font-medium mb-1">Imagem do autor:</label>
-      <input type="file" id="foto" name="foto" class="block w-full text-gray-700 border border-gray-300 rounded p-2">
-    </div>
+      <!-- Nome -->
+      <div class="form-control">
+        <label for="nome" class="label">
+          <span class="label-text font-semibold">Nome do autor</span>
+        </label>
+        <input type="text" id="nome" name="nome" placeholder="Digite o nome do autor" 
+          class="input input-bordered w-full" />
+      </div>
 
-    <div>
-      <label for="nome" class="block text-gray-700 font-medium mb-1">Nome do autor:</label>
-      <input type="text" id="nome" name="nome" placeholder="Nome do autor" class="block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-
-
-<div class="flex justify-center">
-  <input 
-    type="submit" 
-    value="Incluir autor" 
-    class="bg-red-300 text-black font-semibold py-2 px-4 rounded border-2 border-red-400 hover:bg-red-400 hover:border-red-500 transition duration-300 cursor-pointer"
-  />
+      <!-- Botão -->
+      <div class="form-control mt-6">
+        <button type="submit" class="btn btn-primary w-full">➕ Incluir autor</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-    
-  </form>
-</div>
 
---}}
+<div id="autores-container" class="w-full p-6">
+  <!-- Título -->
+  <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+    <h2 class="text-3xl font-bold flex items-center gap-2">
+      👥 Acervo de Autores
+      <span class="badge badge-primary badge-lg">{{ $autores->count() ?? 0 }}</span>
+    </h2>
 
-
-<div id="livros-container" class="w-full p-4">
-  <h2 class="text-xl font-semibold mb-1 text-blue-100 text-stroke tracking-widest">
-    Acervo de autores
-  </h2>
-</div>
-
-  <div class="mb-4">
-    <label for="colSelect" class="mr-2 font-medium">Filtrar coluna:</label>
-    <select id="colSelect" class="border p-2 rounded">
-      <option value="all">Todas</option>
-    </select>
+    <!-- Filtro -->
+    <label class="form-control w-64">
+      <div class="label">
+        <span class="label-text font-semibold">Filtrar coluna</span>
+      </div>
+      <select id="colSelect" class="select select-bordered">
+        <option value="all">Todas</option>
+      </select>
+    </label>
   </div>
 
-<table class="table table-zebra w-full myTable border-gray-200 border-separate border-spacing-0">
-    <thead class="bg-blue-100">
-        <tr>
-            <th class="px-4 py-2 ">Imagem</th> 
-            <th class="px-4 py-2 ">Nome</th>
-
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($autores as $autor)
-        <tr class="hover:bg-gray-50">
-            <td class="px-4 py-2 text-blue-900">
-                <img src="{{ $autor->foto }}" alt="{{ $autor->nome }}" class="w-12 h-12 object-cover rounded">
-            </td>
-            <td class="px-4 py-2 text-blue-900">{{ $autor->nome }}</td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
+  <!-- Tabela -->
+  <div class="card bg-base-100 shadow-md mt-10">
+    <div class="card-body p-0">
+      <div class="overflow-x-auto">
+        <table class="myTable table table-zebra w-full">
+          <thead class="bg-base-200">
+            <tr>
+              <th>📷 Imagem</th>
+              <th>👤 Nome</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($autores as $autor)
+              <tr class="hover">
+                <td>
+                  <img src="{{ $autor->foto }}" alt="{{ $autor->nome }}" 
+                       class="w-12 h-12 object-cover rounded-md shadow-sm">
+                </td>
+                <td class="font-semibold text-primary">{{ $autor->nome }}</td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
-
 
 @endsection
