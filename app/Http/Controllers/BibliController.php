@@ -95,4 +95,22 @@ class BibliController extends Controller
 
         return redirect('/editoras/create')->with('msg', 'Nova editora adicionada com sucesso!');
     }
+
+    //DELETE
+    public function destroyLivro($id){
+        Livro::findOrfail($id)->delete();
+        return redirect('/livros/create')->with('msg', 'Livro excluído com sucesso!');
+    }
+
+        public function destroyEditora($id){
+        Editora::findOrfail($id)->delete();
+        return redirect('/editoras/create')->with('msg', 'Editora excluída com sucesso!');
+    }
+            public function destroyAutor($id){
+        Autor::findOrfail($id)->delete();
+        return redirect('/autores/create')->with('msg', 'Autor excluído com sucesso!');
+    }
+
 }
+
+

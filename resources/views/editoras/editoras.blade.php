@@ -4,6 +4,7 @@
 
 @section('content')
 
+@if(auth()->check() && auth()->user()->is_admin)
 <div id="editoras-create-container" class="max-w-2xl mx-auto mt-10">
   <div class="card bg-base-100 shadow-xl p-8">
     <h1 class="text-3xl font-bold mb-6 text-center">🏢 Registe uma nova editora</h1>
@@ -24,7 +25,7 @@
         <label for="nome" class="label">
           <span class="label-text font-semibold">Nome da editora</span>
         </label>
-        <input type="text" id="nome" name="nome" placeholder="Digite o nome da editora" 
+        <input type="text" id="nome" name="nome" placeholder="Digite o nome da editora"
           class="input input-bordered w-full" />
       </div>
 
@@ -35,7 +36,7 @@
     </form>
   </div>
 </div>
-
+@endif
 
 <div id="editoras-container" class="w-full p-6">
   <!-- Título -->
@@ -65,21 +66,43 @@
             <tr>
               <th>📷 Logotipo</th>
               <th>🏢 Nome</th>
+              <th scope="col" class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">⚙️ Ações</th>
             </tr>
           </thead>
           <tbody>
             @foreach($editoras as $editora)
-              <tr class="hover">
-                <td>
-                  <div class="w-32 h-20 flex items-center justify-center bg-base-200 rounded-md shadow-sm">
-                    <img src="{{ $editora->logotipo }}" alt="{{ $editora->nome }}" 
-                        class="max-h-full max-w-full object-contain">
-                  </div>
+            <tr class="hover">
+              <td>
+                <div class="w-12 h-auto flex items-center justify-center bg-base-200 rounded-md shadow-sm">
+                  <img src="{{ $editora->logotipo }}" alt="{{ $editora->nome }}"
+                    class="max-h-full max-w-full object-contain">
+                </div>
 
 
-                </td>
-                <td class="font-semibold text-primary">{{ $editora->nome }}</td>
-              </tr>
+              </td>
+              <td class="font-semibold text-primary">{{ $editora->nome }}</td>              
+              <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif flex items-center gap-3">
+                <!-- Botão Editar -->
+                <a href="#"
+                  class="px-3 py-1 text-sm rounded-lg flex items-center gap-1 
+            bg-orange-100 text-orange-700 hover:bg-orange-200 transition">
+                  ✏️ Editar
+                </a>
+                <!-- Botão Excluir -->
+                <form action="{{ route('editoras.destroy', $editora->id) }}"
+                  method="POST"
+                  onsubmit="return confirm('Tem certeza que deseja excluir este livro?')">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit"
+                    class="px-3 py-1 text-sm rounded-lg flex items-center gap-1 
+                   bg-red-100 text-red-700 hover:bg-red-200 transition">
+                    🗑️ Excluir
+                  </button>
+                </form>
+              </td>            
+
+            </tr>
             @endforeach
           </tbody>
         </table>

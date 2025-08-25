@@ -21,6 +21,14 @@ Route::post('/autores', [BibliController::class, 'storeAutor']);
 Route::get('/editoras/create', [BibliController::class, 'createEditora']);
 Route::post('/editoras', [BibliController::class, 'storeEditora']);
 
+
+// DELETE 
+Route::delete('/livros/{id}', [BibliController::class, 'destroyLivro'])->name('livros.destroy');
+Route::delete('/editoras/{id}', [BibliController::class, 'destroyEditora'])->name('editoras.destroy');
+Route::delete('/autores/{id}', [BibliController::class, 'destroyAutor'])->name('autores.destroy');
+
+
+
 // Dashboard (protegido por login + verificação de email)
 Route::middleware([
     'auth:sanctum',
@@ -40,3 +48,5 @@ Route::middleware(['auth', 'verified', 'admin'])
             return view('admin.dashboard');
         })->name('dashboard');
     });
+
+
