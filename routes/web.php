@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BibliController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\RequisicaoController;
 
 
 Route::get('/', function () {
@@ -80,3 +80,8 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
     });
 
+
+/* --------------------REQUISIÇÃO--------------------*/
+Route::post('/livros/{livro}/requisitar', [RequisicaoController::class, 'store'])
+    ->middleware('auth')
+    ->name('livros.requisitar');

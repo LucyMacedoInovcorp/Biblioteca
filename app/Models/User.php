@@ -10,7 +10,9 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
-
+/**
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Requisicao[] $requisicoes
+ */
 class User extends Authenticatable
 {
     use HasApiTokens;
@@ -71,4 +73,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'is_admin' => 'boolean',
     ];
+
+    /*--------------------REQUISIÇÕES--------------------*/
+    public function requisicoes()
+    {
+        return $this->hasMany(\App\Models\Requisicao::class);
+    }
 }

@@ -18,8 +18,18 @@ class Livro extends Model
         return $this->belongsTo(Editora::class, 'editora_id', 'id');
     }
 
-        public function autores()
+    public function autores()
     {
         return $this->belongsToMany(Autor::class, 'autor_livro');
     }
+
+    /*--------------------REQUISIÇÕES--------------------*/
+ public function requisicoes()
+{
+    return $this->hasMany(\App\Models\Requisicao::class);
+}
+
+
+
+    
 }

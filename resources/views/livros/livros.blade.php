@@ -110,6 +110,7 @@
               <th scope="col">💶 Preço</th>
               <th scope="col">🏢 Editora</th>
               <th scope="col">👤 Autores</th>
+              <th scope="col" class="@if(!auth()->check()) hidden @endif">📥 Requisição</th>
               <th scope="col" class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">⚙️ Ações</th>
             </tr>
           </thead>
@@ -117,7 +118,7 @@
             @foreach($livros as $livro)
             <tr class="hover">
               <td>
-              <img src="{{ asset($livro->imagemcapa) }}" alt="{{ $livro->nome }}"
+                <img src="{{ asset($livro->imagemcapa) }}" alt="{{ $livro->nome }}"
                   class="w-12 h-12 object-cover rounded-md shadow-sm">
 
               </td>
@@ -143,6 +144,24 @@
                 <span class="badge badge-ghost">Sem autor</span>
                 @endif
               </td>
+              <td>
+                @auth
+                @if(!$livro->requisicoes()->where('ativo', true)->exists()
+                && auth()->user()->requisicoes()->where('ativo', true)->count() < 3)
+
+                  <form action="{{ route('livros.requisitar', $livro->id) }}" method="POST">
+                  @csrf
+                  <button type="submit" class="btn btn-sm btn-success">
+                    📥 Requisitar
+                  </button>
+                  </form>
+
+                  @else
+                  <span class="badge badge-warning">Indisponível</span>
+                  @endif
+                  @endauth
+              </td>
+
               <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif flex items-center gap-3">
 
                 <!-- Botão Editar -->
@@ -163,8 +182,8 @@
                     🗑️ Excluir
                   </button>
                 </form>
-              </td>   
-          
+              </td>
+
             </tr>
             @endforeach
           </tbody>
