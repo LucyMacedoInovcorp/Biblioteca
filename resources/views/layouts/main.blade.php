@@ -158,7 +158,7 @@
       }
     });
 
-    // === Estilização DaisyUI/Tailwind nos controles do DataTables 
+    //Estilização DaisyUI/Tailwind nos controles do DataTables 
     var $wrapper = $(table.table().container());
 
     // Campo de pesquisa

@@ -74,7 +74,7 @@
             <tr class="hover">
               <td>
                 <div class="w-12 h-auto flex items-center justify-center bg-base-200 rounded-md shadow-sm">
-                  <img src="{{ $editora->logotipo }}" alt="{{ $editora->nome }}"
+                  <img src="{{ asset($editora->logotipo) }}" alt="{{ $editora->nome }}"
                     class="max-h-full max-w-full object-contain">
                 </div>
 
@@ -83,7 +83,7 @@
               <td class="font-semibold text-primary">{{ $editora->nome }}</td>              
               <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif flex items-center gap-3">
                 <!-- Botão Editar -->
-                <a href="#"
+                  <a href="{{ route('editoras.edit', $editora->id)}}"
                   class="px-3 py-1 text-sm rounded-lg flex items-center gap-1 
             bg-orange-100 text-orange-700 hover:bg-orange-200 transition">
                   ✏️ Editar

@@ -27,6 +27,15 @@ Route::delete('/livros/{id}', [BibliController::class, 'destroyLivro'])->name('l
 Route::delete('/editoras/{id}', [BibliController::class, 'destroyEditora'])->name('editoras.destroy');
 Route::delete('/autores/{id}', [BibliController::class, 'destroyAutor'])->name('autores.destroy');
 
+//EDIT
+Route::get('/livros/{id}/edit', [BibliController::class, 'editLivro'])->name('livros.edit');
+Route::put('/livros/{id}', [BibliController::class, 'updateLivro'])->name('livros.update');
+
+Route::get('/autores/{id}/edit', [BibliController::class, 'editAutor'])->name('autores.edit');
+Route::put('/autores/{id}', [BibliController::class, 'updateAutor'])->name('autores.update');
+
+Route::get('/editoras/{id}/edit', [BibliController::class, 'editEditora'])->name('editoras.edit');
+Route::put('/editoras/{id}', [BibliController::class, 'updateEditora'])->name('editoras.update');
 
 
 // Dashboard (protegido por login + verificação de email)

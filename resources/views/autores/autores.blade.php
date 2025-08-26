@@ -73,18 +73,18 @@
             @foreach($autores as $autor)
               <tr class="hover">
                 <td>
-                  <img src="{{ $autor->foto }}" alt="{{ $autor->nome }}" 
+                  <img src="{{ asset($autor->foto) }}" alt="{{ $autor->nome }}" 
                        class="w-12 h-12 object-cover rounded-md shadow-sm">
                 </td>
                 <td class="font-semibold text-primary">{{ $autor->nome }}</td>                              
               <td class="@if(!auth()->check() || !auth()->user()->is_admin) invisible @endif flex items-center gap-3">
 
-                <!-- Botão Editar -->
-                <a href="#"
-                  class="px-3 py-1 text-sm rounded-lg flex items-center gap-1 
-            bg-orange-100 text-orange-700 hover:bg-orange-200 transition">
-                  ✏️ Editar
-                </a>
+                    <!-- Botão Editar -->
+                    <a href="{{ route('autores.edit', $autor->id) }}"
+                      class="px-3 py-1 text-sm rounded-lg flex items-center gap-1 
+                bg-orange-100 text-orange-700 hover:bg-orange-200 transition">
+                      ✏️ Editar
+                    </a>
                 <!-- Botão Excluir -->
                 <form action="{{ route('autores.destroy', $autor->id) }}"
                   method="POST"

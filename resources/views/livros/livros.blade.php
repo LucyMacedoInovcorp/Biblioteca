@@ -117,8 +117,9 @@
             @foreach($livros as $livro)
             <tr class="hover">
               <td>
-                <img src="{{ $livro->imagemcapa }}" alt="{{ $livro->nome }}"
+              <img src="{{ asset($livro->imagemcapa) }}" alt="{{ $livro->nome }}"
                   class="w-12 h-12 object-cover rounded-md shadow-sm">
+
               </td>
               <td class="font-semibold text-primary">
                 {{ $livro->nome }}
@@ -145,7 +146,7 @@
               <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif flex items-center gap-3">
 
                 <!-- Botão Editar -->
-                <a href="#"
+                <a href="{{ route('livros.edit', $livro->id) }}"
                   class="px-5 py-5 text-sm rounded-lg flex items-center gap-1 
             bg-orange-100 text-orange-700 hover:bg-orange-200 transition">
                   ✏️ Editar
