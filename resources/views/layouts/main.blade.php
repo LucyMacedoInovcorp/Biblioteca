@@ -65,9 +65,10 @@
         <li><a href="/editoras/create">Editoras</a></li>
         @auth
         @if (auth()->user()->is_admin)
-	          <li><a href="{{ route('admin.dashboard') }}">Administrador</a></li>
+	          <li><a href="{{ route('admin.dashboard') }}">⚙️ Administrador</a></li>
+            <li><a href="{{ route('users.create') }}">👥 Novo Utilizador</a></li>            
         @endif
-        <li><a href="{{ route('profile.show') }}">Perfil</a></li>
+        <li><a href="{{ route('profile.show') }}">👤 Perfil</a></li>
         @endauth
 
 
