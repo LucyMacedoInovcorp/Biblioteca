@@ -85,3 +85,6 @@ Route::middleware(['auth', 'verified', 'admin'])
 Route::post('/livros/{livro}/requisitar', [RequisicaoController::class, 'store'])
     ->middleware('auth')
     ->name('livros.requisitar');
+
+Route::get('/requisicoes', [RequisicaoController::class, 'index'])->name('requisicoes.index');
+  

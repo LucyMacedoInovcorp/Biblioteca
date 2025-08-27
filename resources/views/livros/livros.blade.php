@@ -110,7 +110,7 @@
               <th scope="col">💶 Preço</th>
               <th scope="col">🏢 Editora</th>
               <th scope="col">👤 Autores</th>
-              <th scope="col" class="@if(!auth()->check()) hidden @endif">📥 Requisição</th>
+              <th scope="col">📥 Requisição</th>
               <th scope="col" class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">⚙️ Ações</th>
             </tr>
           </thead>
@@ -145,22 +145,32 @@
                 @endif
               </td>
               <td>
-                @auth
-                @if(!$livro->requisicoes()->where('ativo', true)->exists()
-                && auth()->user()->requisicoes()->where('ativo', true)->count() < 3)
-
+                @if($livro->requisicoes()->where('ativo', true)->exists())
+                <!-- Já tem requisição ativa -->
+                <span class="badge badge-warning">Indisponível</span>
+                @else
+                @guest
+                <!-- Visitante: livro disponível mas precisa logar -->
+                <a href="{{ route('login') }}" class="btn btn-sm btn-outline">
+                  🔑 Requisitar
+                </a>
+                @else
+                <!-- Usuário logado -->
+                @if(auth()->user()->requisicoes()->where('ativo', true)->count() < 3)
                   <form action="{{ route('livros.requisitar', $livro->id) }}" method="POST">
                   @csrf
                   <button type="submit" class="btn btn-sm btn-success">
                     📥 Requisitar
                   </button>
                   </form>
-
                   @else
-                  <span class="badge badge-warning">Indisponível</span>
+                  <span class="badge badge-error">Limite atingido</span>
                   @endif
-                  @endauth
+                  @endguest
+                  @endif
               </td>
+
+
 
               <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif flex items-center gap-3">
 

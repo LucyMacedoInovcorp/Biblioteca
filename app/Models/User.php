@@ -10,6 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+
 /**
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Requisicao[] $requisicoes
  */
@@ -78,5 +79,11 @@ class User extends Authenticatable
     public function requisicoes()
     {
         return $this->hasMany(\App\Models\Requisicao::class);
+    }
+
+    //DEFINIR QUEM VISUALIZA TODAS AS REQUISIÇÕES
+    public function isAdmin()
+    {
+        return $this->is_admin;
     }
 }

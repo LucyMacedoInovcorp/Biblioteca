@@ -38,4 +38,25 @@ class RequisicaoController extends Controller
 
         return back()->with('success', '✅ Requisição realizada com sucesso!');
     }
+
+
+
+
+public function index()
+{
+    $user = Auth::user(); // sempre existe porque a rota tem middleware('auth')
+
+    if ($user->isAdmin()) {
+        // Admin vê todas
+        $requisicoes = Requisicao::with(['livro', 'user'])->get();
+    } else {
+        // Cidadão só vê as dele
+        $requisicoes = Requisicao::with(['livro', 'user'])
+            ->where('user_id', $user->id)
+            ->get();
+    }
+
+    return view('requisicoes.index', compact('requisicoes'));
+}
+
 }

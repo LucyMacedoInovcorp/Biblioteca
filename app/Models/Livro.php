@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Livro extends Model
 {
-    protected $table = 'livros'; // opcional, se o nome da tabela for exatamente esse
+    protected $table = 'livros';
     protected $fillable = ['titulo', 'editora_id'];
 
     /**
@@ -24,12 +24,8 @@ class Livro extends Model
     }
 
     /*--------------------REQUISIÇÕES--------------------*/
- public function requisicoes()
-{
-    return $this->hasMany(\App\Models\Requisicao::class);
-}
-
-
-
-    
+    public function requisicoes()
+    {
+        return $this->hasMany(\App\Models\Requisicao::class);
+    }
 }
