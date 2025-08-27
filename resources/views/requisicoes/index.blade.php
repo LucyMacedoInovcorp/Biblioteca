@@ -18,11 +18,12 @@
         <table class="myTable table table-zebra w-full">
           <thead class="bg-base-200">
             <tr>
-              <th>📷 Imagem</th>
-              <th>📚 Livro</th>
+              <th>📷 Livro</th>
+              <th>👤 Foto</th>
               <th>👤 Usuário</th>
-              <th>🔢 ISBN</th>
-              <th>📅 Status</th>
+              <th>📅 Data Requisição</th>
+              <th>⏳ Data Fim</th>
+              <th>📌 Status</th>
             </tr>
           </thead>
           <tbody>
@@ -32,22 +33,31 @@
                 <td>
                   @if($req->livro && $req->livro->imagemcapa)
                     <img src="{{ asset($req->livro->imagemcapa) }}" alt="{{ $req->livro->nome }}"
-                      class="w-12 h-12 object-cover rounded-md shadow-sm">
+                        class="w-12 h-12 object-cover rounded-md shadow-sm">
                   @else
                     <span class="badge badge-ghost">Sem capa</span>
                   @endif
                 </td>
 
-                <!-- Nome do livro -->
-                <td class="font-semibold text-primary">
-                  {{ $req->livro->nome ?? '—' }}
+                <!-- Foto do requisitante -->
+                <td>
+                  @if($req->user && $req->user->profile_photo_path)
+                    <img src="{{ $req->user->profile_photo_url }}" 
+                        alt="{{ $req->user->name }}" 
+                        class="w-12 h-12 object-cover rounded-full shadow-sm">
+                  @else
+                    <span class="badge badge-ghost">Sem foto</span>
+                  @endif
                 </td>
 
                 <!-- Nome do usuário -->
                 <td>{{ $req->user->name ?? '—' }}</td>
 
-                <!-- ISBN -->
-                <td>{{ $req->livro->ISBN ?? '—' }}</td>
+                <!-- Data da requisição -->
+                <td>{{ $req->created_at->format('d/m/Y') }}</td>
+
+                <!-- Data de fim (5 dias após) -->
+                <td>{{ $req->data_fim->format('d/m/Y') }}</td>
 
                 <!-- Status -->
                 <td>

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models;
+//Para clacular os 5 dias após a requisição
+use Carbon\Carbon;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,4 +21,10 @@ class Requisicao extends Model
     {
         return $this->belongsTo(Livro::class);
     }
+
+
+    //Para clacular os 5 dias após a requisição
+    public function getDataFimAttribute(){
+    return Carbon::parse($this->created_at)->addDays(5);
+}
 }
