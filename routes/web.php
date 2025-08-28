@@ -21,6 +21,8 @@ Route::get('/livros/{id}/edit', [BibliController::class, 'editLivro'])->name('li
 Route::put('/livros/{id}', [BibliController::class, 'updateLivro'])->name('livros.update');
 //DELETE - Rota para excluir um registo de um livro
 Route::delete('/livros/{id}', [BibliController::class, 'destroyLivro'])->name('livros.destroy');
+//SHOW - Exibe os detalhes de um livro específico
+Route::get('/livros/{id}', [BibliController::class, 'showLivro'])->name('livros.show');
 
 
 
@@ -91,5 +93,5 @@ Route::get('/requisicoes', [RequisicaoController::class, 'index'])->name('requis
 Route::post('/requisicoes/{id}/confirmar', [RequisicaoController::class, 'confirmarRececao'])
     ->name('requisicoes.confirmar');
 
-
-  
+/* --------------------DETALHE DOS CIDADÃOS--------------------*/
+  Route::get('/users/{id}', [BibliController::class, 'showCidadao'])->name('users.show');

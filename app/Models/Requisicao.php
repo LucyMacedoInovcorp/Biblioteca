@@ -39,4 +39,6 @@ class Requisicao extends Model
         $fim = $this->data_recepcao ? Carbon::parse($this->data_recepcao) : now();
         return (int) $inicio->diffInDays($fim);
     }
+
+
 }

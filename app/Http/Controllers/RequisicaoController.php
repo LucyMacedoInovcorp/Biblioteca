@@ -80,4 +80,6 @@ class RequisicaoController extends Controller
 
         return back()->with('success', '✅ Devolução confirmada!');
     }
+
+
 }

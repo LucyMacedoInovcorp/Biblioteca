@@ -16,10 +16,10 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'      => ['required','string','max:255'],
-            'email'     => ['required','email','max:255','unique:users,email'],
-            'password'  => ['required','confirmed','min:8'],
-            'is_admin'  => ['required','boolean'], // 0 ou 1
+            'name'      => ['required', 'string', 'max:255'],
+            'email'     => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password'  => ['required', 'confirmed', 'min:8'],
+            'is_admin'  => ['required', 'boolean'], // 0 ou 1
         ]);
 
         User::create([
@@ -31,4 +31,5 @@ class UserController extends Controller
 
         return redirect()->route('users.create')->with('success', 'Utilizador criado com sucesso!');
     }
+
 }

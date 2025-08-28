@@ -24,6 +24,14 @@ class BibliController extends Controller
         return view('livros.livros', compact('livros', 'editoras', 'autores'));
     }
 
+    //Para exibir detalhes do livro e suas requisições
+    public function showLivro($id)
+    {
+        $livro = Livro::with(['requisicoes.user'])->findOrFail($id);
+
+        return view('livros.show', compact('livro'));
+    }
+
     public function storeLivro(Request $request)
     {
         $livro = new Livro;
@@ -159,7 +167,7 @@ class BibliController extends Controller
         return redirect('/editoras/create')->with('msg', 'Nova editora adicionada com sucesso!');
     }
 
-        public function editEditora($id)
+    public function editEditora($id)
     {
         $editora = Editora::findOrFail($id);
         return view('editoras.edit', compact('editora'));
@@ -180,10 +188,17 @@ class BibliController extends Controller
         return redirect('/editoras/create')->with('success', 'Editora atualizada com sucesso!');
     }
 
-        public function destroyEditora($id)
+    public function destroyEditora($id)
     {
         Editora::findOrFail($id)->delete();
         return redirect('/editoras/create')->with('msg', 'Editora excluída com sucesso!');
     }
 
+    //Detalhes do Cidadão
+    public function showCidadao($id)
+    {
+        $user = \App\Models\User::with(['requisicoes.livro'])->findOrFail($id);
+
+        return view('users.show', compact('user'));
+    }
 }

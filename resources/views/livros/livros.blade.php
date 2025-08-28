@@ -103,7 +103,7 @@
         <table class="myTable table table-zebra w-full">
           <thead class="bg-base-200">
             <tr>
-              <th scope="col">📷 Imagem</th>
+              <th scope="col">📕 Capa</th>
               <th scope="col">📚 Nome</th>
               <th scope="col">🔢 ISBN</th>
               <th scope="col">📝 Bibliografia</th>
@@ -122,9 +122,14 @@
                   class="w-12 h-12 object-cover rounded-md shadow-sm">
 
               </td>
-              <td class="font-semibold text-primary">
-                {{ $livro->nome }}
+              <td class="font-semibold">
+                <a href="{{ route('livros.show', $livro->id) }}"
+                  class="link link-primary hover:underline"
+                  title="Detalhe do Livro">
+                  {{ $livro->nome }}
+                </a>
               </td>
+
               <td class="whitespace-nowrap">{{ $livro->ISBN }}</td>
               <td class="max-w-xs truncate" title="{{ $livro->bibliografia }}">
                 {{ $livro->bibliografia }}
