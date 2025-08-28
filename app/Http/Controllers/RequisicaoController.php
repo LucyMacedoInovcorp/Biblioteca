@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Livro;
 use App\Models\Requisicao;
 use Illuminate\Support\Facades\Auth;
+
 
 
 class RequisicaoController extends Controller
@@ -42,21 +44,40 @@ class RequisicaoController extends Controller
 
 
 
-public function index()
-{
-    $user = Auth::user(); // sempre existe porque a rota tem middleware('auth')
+    public function index()
+    {
+        $user = Auth::user();
 
-    if ($user->isAdmin()) {
-        // Admin vê todas
-        $requisicoes = Requisicao::with(['livro', 'user'])->get();
-    } else {
-        // Cidadão só vê as dele
         $requisicoes = Requisicao::with(['livro', 'user'])
-            ->where('user_id', $user->id)
+            ->when(!$user->isAdmin(), function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->orderBy('created_at', 'desc')
             ->get();
+
+        return view('requisicoes.index', compact('requisicoes'));
     }
 
-    return view('requisicoes.index', compact('requisicoes'));
-}
+    public function confirmarRececao($id)
+    {
+        $req = Requisicao::findOrFail($id);
 
+        // data de recepção (hoje)
+        $req->data_recepcao = now();
+
+        // calcular os dias decorridos
+        $req->dias_decorridos = $req->created_at->diffInDays(now());
+
+        // marcar como finalizada
+        $req->ativo = false;
+        $req->save();
+
+        // livro volta a estar disponível
+        if ($req->livro) {
+            $req->livro->disponivel = true;
+            $req->livro->save();
+        }
+
+        return back()->with('success', '✅ Devolução confirmada!');
+    }
 }

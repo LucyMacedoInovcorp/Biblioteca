@@ -22,52 +22,72 @@
               <th>👤 Foto</th>
               <th>👤 Usuário</th>
               <th>📅 Data Requisição</th>
-              <th>⏳ Data Fim</th>
+              <th>📅 Data Devolução</th>
+              <th>⏳ Dias Decorridos</th>
               <th>📌 Status</th>
+              <th>📗 Disponibilidade</th> 
+              <th class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">⚙️ Ações</th>
             </tr>
           </thead>
           <tbody>
             @foreach($requisicoes as $req)
-              <tr class="hover">
-                <!-- Capa do livro -->
-                <td>
-                  @if($req->livro && $req->livro->imagemcapa)
-                    <img src="{{ asset($req->livro->imagemcapa) }}" alt="{{ $req->livro->nome }}"
-                        class="w-12 h-12 object-cover rounded-md shadow-sm">
-                  @else
-                    <span class="badge badge-ghost">Sem capa</span>
-                  @endif
-                </td>
+            <tr class="hover">
+              <!-- Livro -->
+              <td>{{ $req->livro->nome ?? '—' }}</td>
 
-                <!-- Foto do requisitante -->
-                <td>
-                  @if($req->user && $req->user->profile_photo_path)
-                    <img src="{{ $req->user->profile_photo_url }}" 
-                        alt="{{ $req->user->name }}" 
-                        class="w-12 h-12 object-cover rounded-full shadow-sm">
-                  @else
-                    <span class="badge badge-ghost">Sem foto</span>
-                  @endif
-                </td>
+              <!-- Foto -->
+              <td>
+                @if($req->user && $req->user->profile_photo_path)
+                  <img src="{{ $req->user->profile_photo_url }}" class="w-12 h-12 rounded-full">
+                @endif
+              </td>
 
-                <!-- Nome do usuário -->
-                <td>{{ $req->user->name ?? '—' }}</td>
+              <!-- Usuário -->
+              <td>{{ $req->user->name ?? '—' }}</td>
 
-                <!-- Data da requisição -->
-                <td>{{ $req->created_at->format('d/m/Y') }}</td>
+              <!-- Data da requisição -->
+              <td>{{ $req->created_at->format('d/m/Y') }}</td>
 
-                <!-- Data de fim (5 dias após) -->
-                <td>{{ $req->data_fim->format('d/m/Y') }}</td>
+              <!-- Data de devolução -->
+              <td>{{ $req->data_recepcao ? $req->data_recepcao->format('d/m/Y') : '—' }}</td>
 
-                <!-- Status -->
-                <td>
-                  @if($req->ativo)
-                    <span class="badge badge-success">Ativo</span>
-                  @else
-                    <span class="badge badge-error">Finalizado</span>
-                  @endif
-                </td>
-              </tr>
+              <!-- Dias decorridos -->
+              <td>
+                <span class="badge badge-outline">
+                  {{ $req->dias_decorridos }} {{ \Illuminate\Support\Str::plural('dia', $req->dias_decorridos) }}
+                </span>
+              </td>
+
+              <!-- Status -->
+              <td>
+                @if($req->ativo)
+                  <span class="badge badge-success">Ativo</span>
+                @else
+                  <span class="badge badge-error">Finalizado</span>
+                @endif
+              </td>
+
+              <!-- Disponibilidade -->
+              <td>
+                @if($req->livro)
+                  <span class="badge {{ $req->livro->disponivel ? 'badge-success' : 'badge-error' }}">
+                    {{ $req->livro->disponivel ? '🟢 Disponível' : '🔴 Indisponível' }}
+                  </span>
+                @else
+                  —
+                @endif
+              </td>
+
+              <!-- Botão confirmar devolução -->
+              <td>
+                @if($req->ativo)
+                  <form action="{{ route('requisicoes.confirmar', $req->id) }}" method="POST">
+                    @csrf
+                    <button class="btn btn-sm btn-primary">Confirmar Devolução</button>
+                  </form>
+                @endif
+              </td>
+            </tr>
             @endforeach
           </tbody>
         </table>

@@ -28,4 +28,10 @@ class Livro extends Model
     {
         return $this->hasMany(\App\Models\Requisicao::class);
     }
+
+    public function getDisponivelAttribute()
+{
+    return !$this->requisicoes()->where('ativo', true)->exists();
+}
+
 }

@@ -87,4 +87,9 @@ Route::post('/livros/{livro}/requisitar', [RequisicaoController::class, 'store']
     ->name('livros.requisitar');
 
 Route::get('/requisicoes', [RequisicaoController::class, 'index'])->name('requisicoes.index');
+
+Route::post('/requisicoes/{id}/confirmar', [RequisicaoController::class, 'confirmarRececao'])
+    ->name('requisicoes.confirmar');
+
+
   
