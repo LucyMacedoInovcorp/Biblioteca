@@ -6,7 +6,9 @@ namespace App\Http\Controllers;
 use App\Models\Livro;
 use App\Models\Requisicao;
 use Illuminate\Support\Facades\Auth;
-
+//Envio por email
+use App\Mail\NovaRequisicaoMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class RequisicaoController extends Controller
@@ -25,23 +27,29 @@ class RequisicaoController extends Controller
             return back()->with('error', '❌ Você já tem 3 livros ativos requisitados.');
         }
 
-
         // 2. Verificar se livro já foi requisitado
         if ($livro->requisicoes()->where('ativo', true)->exists()) {
             return back()->with('error', '❌ Este livro já está requisitado por outro usuário.');
         }
 
         // 3. Criar requisição
-        Requisicao::create([
+        $requisicao = Requisicao::create([
             'user_id' => $user->id,
             'livro_id' => $livro->id,
             'ativo' => true,
         ]);
 
-        return back()->with('success', '✅ Requisição realizada com sucesso!');
+        // 4. Enviar email para o cidadão
+        Mail::to($user->email)->send(new NovaRequisicaoMail($requisicao));
+
+        // 5. Enviar email para os administradores
+        $admins = \App\Models\User::where('is_admin', true)->pluck('email');
+        foreach ($admins as $adminEmail) {
+            Mail::to($adminEmail)->send(new NovaRequisicaoMail($requisicao));
+        }
+
+        return back()->with('success', '✅ Requisição realizada com sucesso! Um email de confirmação foi enviado.');
     }
-
-
 
 
     public function index()
@@ -80,6 +88,4 @@ class RequisicaoController extends Controller
 
         return back()->with('success', '✅ Devolução confirmada!');
     }
-
-
 }
