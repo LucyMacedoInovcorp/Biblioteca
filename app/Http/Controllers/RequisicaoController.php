@@ -56,15 +56,38 @@ class RequisicaoController extends Controller
     {
         $user = Auth::user();
 
-        $requisicoes = Requisicao::with(['livro', 'user'])
-            ->when(!$user->isAdmin(), function ($query) use ($user) {
+        $requisicoesQuery = Requisicao::with(['livro', 'user'])
+            ->when($user && !$user->is_admin, function ($query) use ($user) {
                 $query->where('user_id', $user->id);
-            })
+            });
+
+        // Pega todas as requisições (com ordenação)
+        $requisicoes = (clone $requisicoesQuery)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('requisicoes.index', compact('requisicoes'));
+        // Indicadores
+        $ativas = (clone $requisicoesQuery)
+            ->where('ativo', true)
+            ->count();
+
+        $ultimos30dias = (clone $requisicoesQuery)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+
+        $entreguesHoje = (clone $requisicoesQuery)
+            ->whereDate('data_recepcao', today())
+            ->count();
+
+        return view('requisicoes.index', compact(
+            'requisicoes',
+            'ativas',
+            'ultimos30dias',
+            'entreguesHoje'
+        ));
     }
+
+
 
     public function confirmarRececao($id)
     {

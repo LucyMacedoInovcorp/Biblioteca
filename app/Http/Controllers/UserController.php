@@ -19,7 +19,7 @@ class UserController extends Controller
             'name'      => ['required', 'string', 'max:255'],
             'email'     => ['required', 'email', 'max:255', 'unique:users,email'],
             'password'  => ['required', 'confirmed', 'min:8'],
-            'is_admin'  => ['required', 'boolean'], // 0 ou 1
+            'is_admin'  => ['required', 'boolean'], 
         ]);
 
         User::create([
