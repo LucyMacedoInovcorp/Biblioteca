@@ -63,7 +63,7 @@
             <!-- Foto -->
             <td>
               @if($req->user && $req->user->profile_photo_path)
-              <img src="{{ $req->user->profile_photo_url }}" class="w-12 h-12 rounded-full">
+              <img src="{{ $req->user->profile_photo_url }}?v={{ $req->user->updated_at->timestamp }}" class="w-12 h-12 rounded-full">
               @endif
             </td>
 
@@ -122,7 +122,7 @@
             </td>
 
             <!-- Botão confirmar devolução -->
-            <td>
+            <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">>
               @if($req->ativo)
               <form action="{{ route('requisicoes.confirmar', $req->id) }}" method="POST">
                 @csrf
