@@ -169,7 +169,7 @@
                   </button>
                   </form>
                   @else
-                  <span class="badge badge-error">Limite atingido</span>
+                  <span class="badge badge-error whitespace-nowrap">Limite atingido</span>
                   @endif
                   @endguest
                   @endif
