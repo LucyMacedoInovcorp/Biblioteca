@@ -9,13 +9,14 @@ Sua requisição foi registrada com sucesso! ✅
 - **Editora:** {{ $requisicao->livro->editora->nome ?? '—' }}
 
 @if($requisicao->livro->imagemcapa)
-![Capa do livro]({{ asset($requisicao->livro->imagemcapa) }})
+<img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path($requisicao->livro->imagemcapa))) }}" alt="Capa">
 @endif
+
+
 ---
  📅 Informações
 - Data da requisição: {{ $requisicao->created_at->format('d/m/Y H:i') }}
-- Status: **Ativo**
+- Status: **Ativo**<br>
 Obrigado,<br>
 {{ config('app.name') }}
 @endcomponent
-Esse markdown do Laravel já formata bem os emails.
