@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6.4",
+        "mailjet/laravel-mailjet": "^3.1",
         "rappasoft/laravel-livewire-tables": "^3.7"
     },
     "require-dev": {

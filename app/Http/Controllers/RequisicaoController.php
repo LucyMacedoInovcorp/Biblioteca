@@ -39,14 +39,48 @@ class RequisicaoController extends Controller
             'ativo' => true,
         ]);
 
-        // 4. Enviar email para o cidadão
+        /* 4. Enviar email para o cidadão
         Mail::to($user->email)->send(new NovaRequisicaoMail($requisicao));
 
         // 5. Enviar email para os administradores
         $admins = \App\Models\User::where('is_admin', true)->pluck('email');
         foreach ($admins as $adminEmail) {
             Mail::to($adminEmail)->send(new NovaRequisicaoMail($requisicao));
+        }*/
+
+
+        /*enviar email com cópia
+        //Enviar requisição para utilizadores e administradores
+        $admins = \App\Models\User::where('is_admin', true)->pluck('email')->toArray();
+
+        Mail::to($user->email)
+            ->cc($admins)
+            ->send(new NovaRequisicaoMail($requisicao));
+
+        */
+
+        /* 
+        // Para o usuário
+        Mail::to($user->email)->send(new NovaRequisicaoMail($requisicao));
+
+        // Para todos os admins
+        $admins = \App\Models\User::where('is_admin', true)->pluck('email')->toArray();
+        foreach ($admins as $adminEmail) {
+            Mail::to($adminEmail)->send(new NovaRequisicaoMail($requisicao));
         }
+        */
+
+        $admins = \App\Models\User::where('is_admin', true)->pluck('email')->toArray();
+
+        Mail::to($user->email)->queue(new NovaRequisicaoMail($requisicao));
+
+        foreach ($admins as $adminEmail) {
+            Mail::to($adminEmail)->queue(new NovaRequisicaoMail($requisicao));
+        }
+
+
+
+
 
         return back()->with('success', '✅ Requisição realizada com sucesso! Um email de confirmação foi enviado.');
     }
