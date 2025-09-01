@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BibliController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RequisicaoController;
+//GOOGLE API
+use App\Http\Controllers\BookSearchController;
+
 
 
 Route::get('/', function () {
@@ -95,3 +98,14 @@ Route::post('/requisicoes/{id}/confirmar', [RequisicaoController::class, 'confir
 
 /* --------------------DETALHE DOS CIDADÃOS--------------------*/
   Route::get('/users/{id}', [BibliController::class, 'showCidadao'])->name('users.show');
+
+  /* --------------------API GOOGLE--------------------*/
+// Rota para a página de pesquisa
+Route::get('/books/search', [BookSearchController::class, 'index'])->name('books.search.index');
+
+// Rota para processar a pesquisa
+Route::get('/books/search-results', [BookSearchController::class, 'search'])->name('books.search.results');
+
+// Salvar livro vindo da API Google Books
+Route::post('/books/store-from-api', [BibliController::class, 'storeFromApi'])
+    ->name('books.storeFromApi');

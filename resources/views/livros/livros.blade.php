@@ -139,16 +139,10 @@
               </td>
               <td>{{ $livro->editora->nome ?? '—' }}</td>
               <td>
-                @if($livro->autores->isNotEmpty())
-                <div class="flex flex-wrap gap-1">
-                  @foreach($livro->autores as $autor)
-                  <span class="badge badge-outline badge-primary">{{ $autor->nome }}</span>
-                  @endforeach
-                </div>
-                @else
-                <span class="badge badge-ghost">Sem autor</span>
-                @endif
+                {{ $livro->autores->pluck('nome')->join(', ') ?: 'Sem autor' }}
               </td>
+
+
               <td>
                 @if($livro->requisicoes()->where('ativo', true)->exists())
                 <!-- Já tem requisição ativa -->
@@ -209,3 +203,4 @@
 </div>
 
 @endsection
+

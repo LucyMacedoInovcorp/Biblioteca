@@ -24,7 +24,7 @@ class BibliController extends Controller
         return view('livros.livros', compact('livros', 'editoras', 'autores'));
     }
 
-    //Para exibir detalhes do livro e suas requisições
+    // Para exibir detalhes do livro e suas requisições
     public function showLivro($id)
     {
         $livro = Livro::with(['requisicoes.user'])->findOrFail($id);
@@ -200,5 +200,47 @@ class BibliController extends Controller
         $user = \App\Models\User::with(['requisicoes.livro'])->findOrFail($id);
 
         return view('users.show', compact('user'));
+    }
+
+    // ---------- API GOOGLE ----------
+    /**
+     * Armazena um livro no banco de dados a partir dos dados da API do Google Books.
+     * Este método é chamado pela rota 'books.store'.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeFromApi(Request $request)
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'isbn' => 'nullable|string|max:255',
+            'authors' => 'nullable|array',
+            'publisher' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'cover_image' => 'nullable|string|max:255',
+        ]);
+
+        // Lógica para encontrar/criar autor e editora
+        $editora = Editora::firstOrCreate(['nome' => $validatedData['publisher'] ?? 'Desconhecida']);
+
+        $autores = collect($validatedData['authors'] ?? [])->map(function ($nome) {
+            return Autor::firstOrCreate(['nome' => $nome]);
+        });
+
+        // Cria o livro
+        $livro = Livro::create([
+            'nome' => $validatedData['title'],
+            'ISBN' => $validatedData['isbn'],
+            'bibliografia' => $validatedData['description'],
+            'preco' => 0, // A API do Google Books não fornece preço.
+            'editora_id' => $editora->id,
+            'imagemcapa' => $validatedData['cover_image'],
+        ]);
+
+        // Sincroniza os autores
+        $livro->autores()->sync($autores->pluck('id'));
+
+        return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
     }
 }

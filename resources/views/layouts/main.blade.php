@@ -68,6 +68,7 @@
 	          <li><a href="{{ route('admin.dashboard') }}">⚙️ Administrador</a></li>
             <li><a href="{{ route('users.create') }}">👥 Novo Utilizador</a></li>            
         @endif
+        <li><a href="{{ route('books.search.index') }}">🔎 Buscar Livros</a></li>  
         <li><a href="{{ route('requisicoes.index') }}">✅ Requisições</a></li>
         <li><a href="{{ route('profile.show') }}">👤 Perfil</a></li>       
         @endauth

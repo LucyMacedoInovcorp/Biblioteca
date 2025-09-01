@@ -8,7 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Livro extends Model
 {
     protected $table = 'livros';
-    protected $fillable = ['titulo', 'editora_id'];
+    protected $fillable = [
+        'nome',
+        'ISBN',
+        'bibliografia',
+        'preco',
+        'editora_id',
+        'imagemcapa'
+    ];
+
 
     /**
      * Um Livro pertence a uma Editora
@@ -30,8 +38,7 @@ class Livro extends Model
     }
 
     public function getDisponivelAttribute()
-{
-    return !$this->requisicoes()->where('ativo', true)->exists();
-}
-
+    {
+        return !$this->requisicoes()->where('ativo', true)->exists();
+    }
 }
