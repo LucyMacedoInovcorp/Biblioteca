@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('ISBN');
             $table->string('nome');
-            $table->text('bibliografia')->nullable();;
-            $table->string('imagemcapa')->nullable();;
+            $table->text('bibliografia')->nullable();
+            $table->string('imagemcapa')->nullable();
             $table->decimal('preco', 8, 2);
             $table->timestamps();
         });

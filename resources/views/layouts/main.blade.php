@@ -146,7 +146,7 @@
         language: {
           search: 'Pesquisar:',
           lengthMenu: 'Mostrar _MENU_ registos',
-          zeroRecords: 'Nada encontrado',
+          zeroRecords: `🤔 Nada encontrado.<a href="{{ route('books.search.index') }}" class="link link-primary">Clique aqui para sugerir aquisição de um novo livro.</a>`,
           info: 'Mostrando _START_-_END_ de _TOTAL_',
           infoEmpty: 'Sem registos',
           infoFiltered: '(filtrado de _MAX_)',
