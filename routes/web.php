@@ -6,6 +6,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RequisicaoController;
 //GOOGLE API
 use App\Http\Controllers\BookSearchController;
+use App\Http\Controllers\WishlistController;
+
+
 
 
 
@@ -14,18 +17,26 @@ Route::get('/', function () {
 });
 
 /* --------------------LIVROS--------------------*/
-//CREATE - Exibe o formulário de criação de um novo livro
+// ----------------- LIVROS -----------------
+// CREATE
 Route::get('/livros/create', [BibliController::class, 'createLivro']);
-//CREATE - Exibe o formulário de criação de um novo livro
 Route::post('/livros', [BibliController::class, 'storeLivro']);
-//EDIT - Exibe o formulário de alteração de um livro
+
+// Busca de livros (deve vir antes da rota dinâmica /livros/{id})
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/livros/search', [BibliController::class, 'searchLivros'])->name('livros.search');
+});
+
+// EDIT
 Route::get('/livros/{id}/edit', [BibliController::class, 'editLivro'])->name('livros.edit');
-//EDIT - Atualiza um registo de um livro
 Route::put('/livros/{id}', [BibliController::class, 'updateLivro'])->name('livros.update');
-//DELETE - Rota para excluir um registo de um livro
+
+// DELETE
 Route::delete('/livros/{id}', [BibliController::class, 'destroyLivro'])->name('livros.destroy');
-//SHOW - Exibe os detalhes de um livro específico
+
+// SHOW - detalhe do livro
 Route::get('/livros/{id}', [BibliController::class, 'showLivro'])->name('livros.show');
+
 
 
 
@@ -109,3 +120,6 @@ Route::get('/books/search-results', [BookSearchController::class, 'search'])->na
 // Salvar livro vindo da API Google Books
 Route::post('/books/store-from-api', [BibliController::class, 'storeFromApi'])
     ->name('books.storeFromApi');
+
+
+

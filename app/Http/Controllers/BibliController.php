@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Livro;
 use App\Models\Autor;
 use App\Models\Editora;
+use Illuminate\Support\Facades\Http;
+use App\Models\WishlistBook;
+use Illuminate\Support\Facades\Auth;
+
 
 class BibliController extends Controller
 {
@@ -242,5 +246,36 @@ class BibliController extends Controller
         $livro->autores()->sync($autores->pluck('id'));
 
         return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
+    }
+
+
+    //ADAPTAR A BUSCA COM A WISHLIST
+    public function searchLivros(Request $request)
+    {
+        $query = $request->input('q');
+
+        // Busca local
+        $livros = Livro::with(['editora', 'autores'])
+            ->when($query, function ($q) use ($query) {
+                $q->where('nome', 'like', "%{$query}%")
+                    ->orWhere('ISBN', 'like', "%{$query}%");
+            })
+            ->get();
+
+        $googleBooks = [];
+
+        // Se não encontrou no acervo, busca na API
+        if ($livros->isEmpty() && $query) {
+            $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
+                'q' => $query,
+                'maxResults' => 5,
+            ]);
+
+            if ($response->successful()) {
+                $googleBooks = $response->json()['items'] ?? [];
+            }
+        }
+
+        return view('livros.search', compact('livros', 'googleBooks', 'query'));
     }
 }
