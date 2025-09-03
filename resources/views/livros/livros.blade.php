@@ -49,11 +49,11 @@
       </div>
       <!-- Editora -->
       <div class="form-control">
-        <label for="editora_id" class="label">
-          <span class="label-text font-semibold">Editora</span>
+        <label for="editoras" class="label">
+          <span class="label-text font-semibold">Editoras</span>
         </label>
-        <select id="editora_id" name="editora_id" class="select select-bordered w-full" required>
-          <option disabled selected>Selecione a editora</option>
+        <select id="editoras" name="editoras[]" multiple placeholder="Selecione a editora...">
+
           @foreach($editoras as $editora)
           <option value="{{ $editora->id }}">{{ $editora->nome }}</option>
           @endforeach
@@ -64,20 +64,32 @@
         <label for="autores" class="label">
           <span class="label-text font-semibold">Autores</span>
         </label>
-        <select id="autores" name="autores[]" class="select select-bordered w-full" multiple required>
+        <select id="autores" name="autores[]" multiple placeholder="Selecione autores...">
           @foreach($autores as $autor)
           <option value="{{ $autor->id }}">{{ $autor->nome }}</option>
           @endforeach
         </select>
-        <small class="text-gray-500 mt-1">💡 Segure CTRL (ou CMD no Mac) para selecionar vários autores</small>
       </div>
       <!-- Botão -->
-      <div class="form-control mt-6">
+      <div class="form-control">
         <button type="submit" class="btn btn-primary w-full">➕ Incluir livro</button>
       </div>
     </form>
+
+    <div class="form-control mt-6">
+      <a href="{{ route('books.search.index') }}"
+        class="block p-4 text-center rounded-xl border border-base-300 
+            bg-base-200 hover:bg-base-300 transition">
+        🔍 Inclua através do <span class="font-bold text-primary">Google Livros</span>
+      </a>
+    </div>
+
   </div>
+
 </div>
+
+
+
 @endif
 <div id="livros-container" class="w-full p-6">
   <!-- Título -->
@@ -202,5 +214,37 @@
   </div>
 </div>
 
-@endsection
+{{--Tom select--}}
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
+<script>
+  new TomSelect("#autores", {
+    plugins: ['remove_button'],
+    create: false,
+    sortField: {
+      field: "text",
+      direction: "asc"
+    },
+    maxOptions: 50,
+    onItemAdd: function() {
+      this.setTextboxValue('');
+    }
+  });
+
+  new TomSelect("#editoras", {
+    plugins: ['remove_button'],
+    maxItems: 1,
+    create: false,
+    sortField: {
+      field: "text",
+      direction: "asc"
+    },
+    maxOptions: 50,
+    onItemAdd: function() {
+      this.setTextboxValue('');
+    }
+  });
+</script>
+
+@endsection

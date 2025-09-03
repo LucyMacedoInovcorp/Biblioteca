@@ -43,7 +43,7 @@
         -1px 1px 0 #1e3a8a,
         1px 1px 0 #1e3a8a;
       margin-bottom: 1.5rem;
-    }
+    }    
   </style>
 
 </head>

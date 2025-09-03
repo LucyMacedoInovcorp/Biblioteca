@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Services\GoogleBooksService;
@@ -16,9 +17,13 @@ class BookSearchController extends Controller
 
     public function index()
     {
-        return view('books.search'); // Criar esta view mais tarde
+        $defaultQuery = 'best sellers'; 
+        $results = $this->googleBooksService->searchBooks($defaultQuery);
+        
+        return view('books.search', ['results' => $results, 'query' => null]);
     }
 
+    
     public function search(Request $request)
     {
         $query = $request->input('q');
@@ -27,3 +32,5 @@ class BookSearchController extends Controller
         return view('books.search', ['results' => $results, 'query' => $query]);
     }
 }
+
+

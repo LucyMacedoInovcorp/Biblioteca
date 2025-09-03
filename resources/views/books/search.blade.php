@@ -2,6 +2,18 @@
 @section('title', 'Buscar Livros')
 @section('content')
 
+
+<div class="form-control mt-6 mb-6">
+  <div class="w-full max-w-md mx-auto rounded-xl border border-base-300 
+              bg-base-200 p-4 text-center shadow-sm hover:shadow-md 
+              transition flex items-center justify-center gap-2">       
+    🔍 Pesquise com <span class="font-bold text-primary">Google Livros</span>
+  </div>
+</div>
+
+
+
+
 <!-- Formulário de Pesquisa -->
 <form action="{{ route('books.search.results') }}" method="GET" class="mb-8 w-full max-w-md mx-auto">
     <div class="flex">
