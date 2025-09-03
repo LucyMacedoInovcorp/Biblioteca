@@ -23,9 +23,11 @@ class NovaRequisicaoMail extends Mailable
     /**
      * Build the message.
      */
-    public function build()
-    {
-        return $this->subject('📚 Nova Requisição de Livro')
-                    ->markdown('emails.nova_requisicao');
-    }
+public function build()
+{
+    return $this->subject('📚 Nova Requisição de Livro')
+                ->bcc('admin@exemplo.com')
+                ->markdown('emails.nova_requisicao');
+}
+
 }

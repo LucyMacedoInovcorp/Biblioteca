@@ -2,90 +2,63 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Livro;
 use App\Models\Requisicao;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-//Envio por email
 use App\Mail\NovaRequisicaoMail;
 use Illuminate\Support\Facades\Mail;
 
-
 class RequisicaoController extends Controller
 {
+    /**
+     * Registrar uma nova requisição de livro
+     */
     public function store(Livro $livro)
     {
-        // Garante que o usuário está logado
+        // 1. Verifica autenticação
         if (!Auth::check()) {
             return back()->with('error', '❌ Você precisa estar autenticado para requisitar um livro.');
         }
 
-        $user = Auth::user(); // aqui você já sabe que existe um usuário
+        $user = Auth::user();
 
-        // 1. Verificar limite
+        // 2. Verificar limite de 3 livros ativos
         if ($user->requisicoes()->where('ativo', true)->count() >= 3) {
             return back()->with('error', '❌ Você já tem 3 livros ativos requisitados.');
         }
 
-        // 2. Verificar se livro já foi requisitado
+        // 3. Verificar se o livro já está requisitado
         if ($livro->requisicoes()->where('ativo', true)->exists()) {
             return back()->with('error', '❌ Este livro já está requisitado por outro usuário.');
         }
 
-        // 3. Criar requisição
+        // 4. Criar a requisição
         $requisicao = Requisicao::create([
-            'user_id' => $user->id,
+            'user_id'  => $user->id,
             'livro_id' => $livro->id,
-            'ativo' => true,
+            'ativo'    => true,
         ]);
 
-        /* 4. Enviar email para o cidadão
-        Mail::to($user->email)->send(new NovaRequisicaoMail($requisicao));
+        // 5. Enviar e-mails
+        $admins = User::where('is_admin', true)->pluck('email')->toArray();
 
-        // 5. Enviar email para os administradores
-        $admins = \App\Models\User::where('is_admin', true)->pluck('email');
-        foreach ($admins as $adminEmail) {
-            Mail::to($adminEmail)->send(new NovaRequisicaoMail($requisicao));
-        }*/
-
-
-        /*enviar email com cópia
-        //Enviar requisição para utilizadores e administradores
-        $admins = \App\Models\User::where('is_admin', true)->pluck('email')->toArray();
-
-        Mail::to($user->email)
-            ->cc($admins)
+        // Email para o utilizador
+        Mail::to($user->email)  
             ->send(new NovaRequisicaoMail($requisicao));
-
-        */
-
-        /* 
-        // Para o usuário
-        Mail::to($user->email)->send(new NovaRequisicaoMail($requisicao));
-
-        // Para todos os admins
-        $admins = \App\Models\User::where('is_admin', true)->pluck('email')->toArray();
+            
+        // Email para cada administrador
         foreach ($admins as $adminEmail) {
-            Mail::to($adminEmail)->send(new NovaRequisicaoMail($requisicao));
-        }
-        */
-
-        $admins = \App\Models\User::where('is_admin', true)->pluck('email')->toArray();
-
-        Mail::to($user->email)->queue(new NovaRequisicaoMail($requisicao));
-
-        foreach ($admins as $adminEmail) {
-            Mail::to($adminEmail)->queue(new NovaRequisicaoMail($requisicao));
+            Mail::to($adminEmail)
+                ->send(new NovaRequisicaoMail($requisicao));
         }
 
-
-
-
-
-        return back()->with('success', '✅ Requisição realizada com sucesso! Um email de confirmação foi enviado.');
+        return back()->with('success', '✅ Requisição realizada com sucesso! Um e-mail de confirmação foi enviado.');
     }
 
-
+    /**
+     * Listar requisições do usuário (ou todas, se admin)
+     */
     public function index()
     {
         $user = Auth::user();
@@ -95,12 +68,10 @@ class RequisicaoController extends Controller
                 $query->where('user_id', $user->id);
             });
 
-        // Pega todas as requisições (com ordenação)
         $requisicoes = (clone $requisicoesQuery)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Indicadores
         $ativas = (clone $requisicoesQuery)
             ->where('ativo', true)
             ->count();
@@ -121,23 +92,18 @@ class RequisicaoController extends Controller
         ));
     }
 
-
-
+    /**
+     * Confirmar devolução de um livro
+     */
     public function confirmarRececao($id)
     {
         $req = Requisicao::findOrFail($id);
 
-        // data de recepção (hoje)
-        $req->data_recepcao = now();
-
-        // calcular os dias decorridos
+        $req->data_recepcao  = now();
         $req->dias_decorridos = $req->created_at->diffInDays(now());
-
-        // marcar como finalizada
         $req->ativo = false;
         $req->save();
 
-        // livro volta a estar disponível
         if ($req->livro) {
             $req->livro->disponivel = true;
             $req->livro->save();

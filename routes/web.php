@@ -6,8 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RequisicaoController;
 //GOOGLE API - ADMINISTRADOR
 use App\Http\Controllers\BookSearchController;
-//GOOGLE API - SUGESTÕES
-use App\Http\Controllers\SugestaoController;
+//MAIL TESTE
+use Illuminate\Support\Facades\Mail;
 
 
 Route::get('/', function () {
@@ -118,5 +118,7 @@ Route::get('/books/search-results', [BookSearchController::class, 'search'])->na
 // Salvar livro vindo da API Google Books
 Route::post('/books/store-from-api', [BibliController::class, 'storeFromApi'])
     ->name('books.storeFromApi');
+
+
 
  
