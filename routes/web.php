@@ -119,22 +119,4 @@ Route::get('/books/search-results', [BookSearchController::class, 'search'])->na
 Route::post('/books/store-from-api', [BibliController::class, 'storeFromApi'])
     ->name('books.storeFromApi');
 
- /* --------------------API GOOGLE - SUGESTÕES--------------------*/
-// Rotas protegidas para utilizadores autenticados
-Route::middleware('auth')->group(function () {
-    // Rota para a página de sugestões
-    Route::get('/sugestoes', [SugestaoController::class, 'index'])->name('livros.sugestoes.index');
-
-    // Rota para salvar uma nova sugestão
-    Route::post('/sugestoes', [SugestaoController::class, 'store'])->name('sugestoes.store');
-});
-
-// Rotas de administrador (já com middleware `auth` e `is_admin`)
-Route::middleware(['auth', 'is_admin'])->group(function () {
-    Route::post('/sugestoes/{sugestao}/aprovar', [SugestaoController::class, 'aprovar'])->name('sugestoes.aprovar');
-    Route::delete('/sugestoes/{sugestao}', [SugestaoController::class, 'destroy'])->name('sugestoes.destroy');
-});
-
-// Rota para salvar um livro vindo da API Google Books a partir de uma sugestão
-Route::post('/sugestoes/store-from-api', [SugestaoController::class, 'storeFromApi'])
-     ->name('sugestoes.storeFromApi');
+ 
