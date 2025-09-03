@@ -12,9 +12,8 @@ Sua requisição foi registrada com sucesso! ✅
 - **ISBN:** {{ $requisicao->livro->ISBN }}
 - **Editora:** {{ $requisicao->livro->editora->nome ?? '—' }}
 
-@if($requisicao->livro->imagemcapa)
-    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path($requisicao->livro->imagemcapa))) }}" 
-         alt="Capa" style="max-width:150px;">
+@if(isset($imagemPath))
+    <img src="{{ $imagemPath }}" alt="Capa" style="max-width:150px;">
 @endif
 
 ---
