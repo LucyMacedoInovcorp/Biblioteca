@@ -15,17 +15,17 @@
             <!-- Logotipo da Editora -->
             <div class="form-control">
                 @if($editora->logotipo)
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">📌 Logotipo atual:</p>
-                        <img src="{{ asset($editora->logotipo) }}" alt="Logotipo da Editora"
-                             class="w-32 h-44 object-cover rounded-lg shadow-md">
-                    </div>
+                <div class="mb-3">
+                    <p class="text-sm text-gray-500">📌 Logotipo atual:</p>
+                    <img src="{{ asset($editora->logotipo) }}" alt="Logotipo da Editora"
+                        class="w-32 h-44 object-cover rounded-lg shadow-md">
+                </div>
                 @endif
 
                 <!-- Input para novo logotipo -->
                 <input type="file" id="logotipo" name="logotipo"
-                       class="file-input file-input-bordered w-full"
-                       onchange="previewImage(event)" />
+                    class="file-input file-input-bordered w-full"
+                    onchange="previewImage(event)" />
 
                 <!-- Preview do novo logotipo escolhido -->
                 <div class="mt-3 hidden" id="preview-container">
@@ -37,9 +37,10 @@
             <!-- Nome -->
             <div class="form-control">
                 <input type="text" id="nome" name="nome"
-                       value="{{ old('nome', $editora->nome) }}"
-                       class="input input-bordered w-full" />
+                    value="{{ old('nome', $editora->nome) }}"
+                    class="input input-bordered w-full" />
             </div>
+
 
             <!-- Botão -->
             <div class="form-control mt-6">

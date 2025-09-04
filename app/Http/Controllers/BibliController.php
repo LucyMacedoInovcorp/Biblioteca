@@ -37,27 +37,38 @@ class BibliController extends Controller
     }
 
     public function storeLivro(Request $request)
-    {
-        $livro = new Livro;
-        $livro->nome         = $request->nome;
-        $livro->ISBN         = $request->ISBN;
-        $livro->bibliografia = $request->bibliografia;
-        $livro->preco        = $request->preco;
-        $livro->editora_id   = $request->editora_id;
+{
+    $request->validate([
+        'nome' => 'required|string|max:255',
+        'ISBN' => 'nullable|string|max:255',
+        'bibliografia' => 'nullable|string',
+        'preco' => 'required|numeric',
+        'editoras' => 'required|array|min:1',
+        'autores' => 'required|array|min:1',
+    ]);
 
-        if ($request->hasFile('imagemcapa')) {
-            $path = $request->file('imagemcapa')->store('capas', 'public');
-            $livro->imagemcapa = '/storage/' . $path;
-        }
+    $livro = new Livro;
+    $livro->nome         = $request->nome;
+    $livro->ISBN         = $request->ISBN;
+    $livro->bibliografia = $request->bibliografia;
+    $livro->preco        = $request->preco;
+    $livro->editora_id   = $request->editoras[0]; // Corrigido aqui
 
-        $livro->save();
-
-        if ($request->filled('autores')) {
-            $livro->autores()->sync($request->autores);
-        }
-
-        return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
+    if ($request->hasFile('imagemcapa')) {
+        $path = $request->file('imagemcapa')->store('capas', 'public');
+        $livro->imagemcapa = '/storage/' . $path;
+    } else {
+        $livro->imagemcapa = '/images/default-book.png';
     }
+
+    $livro->save();
+
+    if ($request->filled('autores')) {
+        $livro->autores()->sync($request->autores);
+    }
+
+    return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
+}
 
     public function editLivro($id)
     {
@@ -114,6 +125,9 @@ class BibliController extends Controller
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('autores', 'public');
             $autor->foto = '/storage/' . $path;
+        }else {
+            // Caminho relativo à pasta public
+            $autor->foto = '/images/default-book.png';
         }
 
         $autor->save();
@@ -156,6 +170,7 @@ class BibliController extends Controller
         return view('editoras.editoras', compact('editoras'));
     }
 
+
     public function storeEditora(Request $request)
     {
         $editora = new Editora;
@@ -164,6 +179,9 @@ class BibliController extends Controller
         if ($request->hasFile('logotipo')) {
             $path = $request->file('logotipo')->store('editoras', 'public');
             $editora->logotipo = '/storage/' . $path;
+        } else {
+            // Caminho relativo à pasta public
+            $editora->logotipo = '/images/default-book.png';
         }
 
         $editora->save();
@@ -214,68 +232,49 @@ class BibliController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function storeFromApi(Request $request)
-    {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'isbn' => 'nullable|string|max:255',
-            'authors' => 'nullable|array',
-            'publisher' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'cover_image' => 'nullable|string|max:255',
-        ]);
-
-        // Lógica para encontrar/criar autor e editora
-        $editora = Editora::firstOrCreate(['nome' => $validatedData['publisher'] ?? 'Desconhecida']);
-
-        $autores = collect($validatedData['authors'] ?? [])->map(function ($nome) {
-            return Autor::firstOrCreate(['nome' => $nome]);
-        });
-
-        // Cria o livro
-        $livro = Livro::create([
-            'nome' => $validatedData['title'],
-            'ISBN' => $validatedData['isbn'],
-            'bibliografia' => $validatedData['description'],
-            'preco' => 0, // A API do Google Books não fornece preço.
-            'editora_id' => $editora->id,
-            'imagemcapa' => $validatedData['cover_image'],
-        ]);
-
-        // Sincroniza os autores
-        $livro->autores()->sync($autores->pluck('id'));
-
-        return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
-    }
 
 
-    //ADAPTAR A BUSCA COM A WISHLIST
-    public function searchLivros(Request $request)
-    {
-        $query = $request->input('q');
 
-        // Busca local
-        $livros = Livro::with(['editora', 'autores'])
-            ->when($query, function ($q) use ($query) {
-                $q->where('nome', 'like', "%{$query}%")
-                    ->orWhere('ISBN', 'like', "%{$query}%");
-            })
-            ->get();
+public function storeFromApi(Request $request)
+{
+    $validatedData = $request->validate([
+        'title' => 'required|string|max:255',
+        'isbn' => 'nullable|string|max:255',
+        'authors' => 'nullable|array',
+        'publisher' => 'nullable|string|max:255',
+        'description' => 'nullable|string',
+        'cover_image' => 'nullable|string|max:255',
+    ]);
 
-        $googleBooks = [];
+    // Editora: se não existe, cria com imagem padrão
+    $editora = Editora::firstOrCreate(
+        ['nome' => $validatedData['publisher'] ?? 'Desconhecida'],
+        ['logotipo' => '/images/default-book.png']
+    );
 
-        // Se não encontrou no acervo, busca na API
-        if ($livros->isEmpty() && $query) {
-            $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
-                'q' => $query,
-                'maxResults' => 5,
-            ]);
+    // Autores: se não existe, cria com imagem padrão
+    $autores = collect($validatedData['authors'] ?? [])->map(function ($nome) {
+        return Autor::firstOrCreate(
+            ['nome' => $nome],
+            ['foto' => '/images/default-book.png']
+        );
+    });
 
-            if ($response->successful()) {
-                $googleBooks = $response->json()['items'] ?? [];
-            }
-        }
+    // Livro: se não tem capa, usa imagem padrão
+    $imagemCapa = $validatedData['cover_image'] ?: '/images/default-book.png';
 
-        return view('livros.search', compact('livros', 'googleBooks', 'query'));
-    }
+    $livro = Livro::create([
+        'nome' => $validatedData['title'],
+        'ISBN' => $validatedData['isbn'],
+        'bibliografia' => $validatedData['description'],
+        'preco' => 0,
+        'editora_id' => $editora->id,
+        'imagemcapa' => $imagemCapa,
+    ]);
+
+    $livro->autores()->sync($autores->pluck('id'));
+
+    return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
+}
+
 }

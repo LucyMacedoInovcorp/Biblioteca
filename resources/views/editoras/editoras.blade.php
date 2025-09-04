@@ -64,7 +64,7 @@
         <table class="myTable table table-zebra w-full">
           <thead class="bg-base-200">
             <tr>
-              <th>📷 Logotipo</th>
+              <th>📷 Logotipo</th>              
               <th>🏢 Nome</th>
               <th scope="col" class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">⚙️ Ações</th>
             </tr>

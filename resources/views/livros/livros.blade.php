@@ -74,7 +74,7 @@
           @foreach($editoras as $editora)
           <option value="{{ $editora->id }}">{{ $editora->nome }}</option>
           @endforeach
-        </select>
+        </select>   
       </div>
       <!-- Autores -->
       <div class="form-control">
@@ -87,6 +87,9 @@
           @endforeach
         </select>
       </div>
+      <!-- Imagem padrão -->
+      <input type="hidden" name="imagem_padrao" value="default-book.png">
+
       <!-- Botão -->
       <div class="form-control">
         <button type="submit" class="btn btn-primary w-full">➕ Incluir livro</button>
@@ -246,6 +249,16 @@
     maxOptions: 50,
     onItemAdd: function() {
       this.setTextboxValue('');
+    },
+    render: {
+      no_results: function(data, escape) {
+        return `<div class="p-2 text-center">
+          Nenhum autor encontrado.<br>
+          <a href="http://biblioteca-app.test/autores/create" class="link link-primary underline">
+            Adicione à lista
+          </a>
+        </div>`;
+      }
     }
   });
 
@@ -260,6 +273,16 @@
     maxOptions: 50,
     onItemAdd: function() {
       this.setTextboxValue('');
+    },
+    render: {
+      no_results: function(data, escape) {
+        return `<div class="p-2 text-center">
+          Nenhuma editora encontrada.<br>
+          <a href="http://biblioteca-app.test/editoras/create" class="link link-primary underline">
+            Adicione à lista
+          </a>
+        </div>`;
+      }
     }
   });
 </script>
