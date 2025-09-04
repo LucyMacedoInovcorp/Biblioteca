@@ -52,7 +52,7 @@ class BibliController extends Controller
     $livro->ISBN         = $request->ISBN;
     $livro->bibliografia = $request->bibliografia;
     $livro->preco        = $request->preco;
-    $livro->editora_id   = $request->editoras[0]; // Corrigido aqui
+    $livro->editora_id   = $request->editoras[0];
 
     if ($request->hasFile('imagemcapa')) {
         $path = $request->file('imagemcapa')->store('capas', 'public');

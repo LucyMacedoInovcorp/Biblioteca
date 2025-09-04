@@ -36,7 +36,7 @@
     </form>
   </div>
 </div>
-
+@endif
 
 <div id="autores-container" class="w-full p-6">
   <!-- Título -->
@@ -56,7 +56,7 @@
       </select>
     </label>
   </div>
-@endif
+
   <!-- Tabela -->
   <div class="card bg-base-100 shadow-md mt-10">
     <div class="card-body p-0">

@@ -138,25 +138,26 @@
   <script>
     $(document).ready(function() {
       var table = $('.myTable').DataTable({
-        dom: 'Bfrtip',
-        buttons: [{
-          extend: 'excelHtml5',
-          text: 'Exportar Excel'
-        }],
-        language: {
-          search: 'Pesquisar:',
-          lengthMenu: 'Mostrar _MENU_ registos',
-          zeroRecords: 'Nada encontrado',
-          info: 'Mostrando _START_-_END_ de _TOTAL_',
-          infoEmpty: 'Sem registos',
-          infoFiltered: '(filtrado de _MAX_)',
-          paginate: {
-            first: 'Primeiro',
-            last: 'Último',
-            next: 'Próximo',
-            previous: 'Anterior'
-          }
+      dom: 'Bfrtip',
+      buttons: [{
+        extend: 'excelHtml5',
+        text: 'Exportar Excel'
+      }],
+      order: [['desc' ]],
+      language: {
+        search: 'Pesquisar:',
+        lengthMenu: 'Mostrar _MENU_ registos',
+        zeroRecords: 'Nada encontrado',
+        info: 'Mostrando _START_-_END_ de _TOTAL_',
+        infoEmpty: 'Sem registos',
+        infoFiltered: '(filtrado de _MAX_)',
+        paginate: {
+        first: 'Primeiro',
+        last: 'Último',
+        next: 'Próximo',
+        previous: 'Anterior'
         }
+      }
       });
 
       //Estilização DaisyUI/Tailwind nos controles do DataTables 

@@ -56,7 +56,7 @@
                 {{ $req->livro->nome }}
               </a>
               @else
-              —
+              
               @endif
             </td>
 
@@ -101,7 +101,7 @@
 
 
 
-            -
+            
             <td>
               @if($req->ativo)
               <span class="badge badge-success">Ativo</span>
@@ -117,7 +117,7 @@
                 {{ $req->livro->disponivel ? '🟢 Disponível' : '🔴 Indisponível' }}
               </span>
               @else
-              —
+              
               @endif
             </td>
 
