@@ -2,6 +2,23 @@
 @section('title', 'Livros')
 @section('content')
 
+@if (session('success'))
+    <div class="alert alert-success shadow-lg mb-4">
+        <div>
+            <span>{{ session('success') }}</span>
+        </div>
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-error shadow-lg mb-4">
+        <div>
+            <span>{{ session('error') }}</span>
+        </div>
+    </div>
+@endif
+
+
 @if(auth()->check() && auth()->user()->is_admin)
 <div id="livros-create-container" class="max-w-2xl mx-auto mt-10">
   <div class="card bg-base-100 shadow-xl p-8">

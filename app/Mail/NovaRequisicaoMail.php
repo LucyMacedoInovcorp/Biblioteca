@@ -12,7 +12,7 @@ class NovaRequisicaoMail extends Mailable
     use Queueable, SerializesModels;
 
     public $requisicao;
-    public $imagemPath; // aqui vamos guardar o caminho da imagem para a blade
+    public $imagemPath; 
 
     /**
      * Create a new message instance.
@@ -35,10 +35,10 @@ class NovaRequisicaoMail extends Mailable
             $this->attach($caminho, [
                 'as' => 'capa.jpg',
                 'mime' => 'image/jpeg',
-                'display' => 'inline', // isso é o que permite o embed no email
+                'display' => 'inline', 
             ]);
 
-            // Define o src que será usado na blade
+           
             $this->imagemPath = 'cid:capa.jpg';
         }
 

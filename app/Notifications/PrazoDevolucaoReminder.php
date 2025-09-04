@@ -26,7 +26,7 @@ class PrazoDevolucaoReminder extends Notification
             ->line("Este é um lembrete de que o prazo de devolução de **{$livro}** é amanhã.")
             ->line("Data limite: **{$prazo}**")
             ->line('Obrigado pela colaboração!')
-            ->salutation('Biblioteca Municipal 📚');
+            ->salutation('BibliON 📚');
     }
 }
 

@@ -15,7 +15,8 @@ class EnviarLembretesDevolucao extends Command
 
     public function handle()
     {
-        $amanha = Carbon::tomorrow();
+        $amanha = Carbon::tomorrow();        
+        $amanha = Carbon::create(2025, 9, 8);
 
         // Busca requisições ativas e verifica se o prazo_devolucao é amanhã
         $requisicoes = Requisicao::where('ativo', true)
@@ -36,4 +37,6 @@ class EnviarLembretesDevolucao extends Command
 
         return self::SUCCESS;
     }
+
+
 }
