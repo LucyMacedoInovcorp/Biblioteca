@@ -41,4 +41,10 @@ class Livro extends Model
     {
         return !$this->requisicoes()->where('ativo', true)->exists();
     }
+
+    // Relação com Avaliações
+    public function avaliacoes()
+    {
+        return $this->hasMany(\App\Models\Avaliacao::class, 'livro_id');
+    }
 }

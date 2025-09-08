@@ -12,7 +12,7 @@ class NovaRequisicaoMail extends Mailable
     use Queueable, SerializesModels;
 
     public $requisicao;
-    public $imagemPath; 
+    public $imagemPath;
 
     /**
      * Create a new message instance.
@@ -25,27 +25,39 @@ class NovaRequisicaoMail extends Mailable
     /**
      * Build the message.
      */
+
     public function build()
     {
-        // Verifica se o livro tem imagem
-        if ($this->requisicao->livro->imagemcapa) {
-            $caminho = public_path($this->requisicao->livro->imagemcapa);
+        $imagemcapa = $this->requisicao->livro->imagemcapa;
 
-            // Adiciona a imagem como anexo inline
-            $this->attach($caminho, [
-                'as' => 'capa.jpg',
-                'mime' => 'image/jpeg',
-                'display' => 'inline', 
-            ]);
+        if ($imagemcapa) {
+            // Remove a barra inicial, se existir
+            $imagemcapa = ltrim($imagemcapa, '/');
 
-           
-            $this->imagemPath = 'cid:capa.jpg';
+            // Se começa com 'storage/', converte para caminho real
+            if (strpos($imagemcapa, 'storage/') === 0) {
+                $caminhoFisico = storage_path('app/public/' . substr($imagemcapa, strlen('storage/')));
+            } else {
+                $caminhoFisico = public_path($imagemcapa);
+            }
+
+            // Só anexa se o arquivo existir
+            if (file_exists($caminhoFisico)) {
+                $this->attach($caminhoFisico, [
+                    'as' => 'capa.jpg',
+                    'mime' => 'image/jpeg',
+                    'display' => 'inline',
+                ]);
+                $this->imagemPath = 'cid:capa.jpg';
+            } else {
+                $this->imagemPath = null;
+            }
         }
 
         return $this->subject('📚 Nova Requisição de Livro')
-                    ->markdown('emails.nova_requisicao')
-                    ->with([
-                        'imagemPath' => $this->imagemPath ?? null,
-                    ]);
+            ->markdown('emails.nova_requisicao')
+            ->with([
+                'imagemPath' => $this->imagemPath ?? null,
+            ]);
     }
 }

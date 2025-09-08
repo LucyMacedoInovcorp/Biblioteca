@@ -16,8 +16,6 @@
                     {{ $livro->disponivel ? '🟢 Disponível' : '🔴 Indisponível' }}
                 </span>
             </p>
-        </div>
-    </div>
 
     <!-- Histórico de requisições -->
     <div class="card bg-base-100 shadow-md">
@@ -58,6 +56,29 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+        <!-- Reviews ativos -->
+    <div class="card bg-base-100 shadow-md mt-8">
+        <div class="card-body">
+            <h3 class="text-2xl font-semibold mb-4">📝 Avaliações</h3>
+            @php
+                $reviewsAtivos = $livro->avaliacoes->where('status', 'ativo');
+            @endphp
+            @if($reviewsAtivos->count())
+                <ul class="space-y-4">
+                    @foreach($reviewsAtivos as $review)
+                        <li class="border-b pb-2">
+                            <div class="font-semibold text-lg">{{ $review->user->name ?? 'Cidadão' }}</div>
+                            <div class="text-yellow-700 font-bold">Nota: {{ $review->rating }}</div>
+                            <div class="mt-1">{{ $review->review }}</div>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <div class="text-gray-500">Nenhuma avaliação ativa para este livro.</div>
+            @endif
         </div>
     </div>
 

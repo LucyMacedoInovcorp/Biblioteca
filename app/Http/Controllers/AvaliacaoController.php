@@ -62,11 +62,12 @@ class AvaliacaoController extends Controller
     }
 
     // Rejeitar avaliação
-    public function rejeitar($id)
+    public function rejeitar(Request $request, $id)
     {
         $avaliacao = Avaliacao::findOrFail($id);
-    $avaliacao->status = 'recusado';
+        $avaliacao->status = 'recusado';
+        $avaliacao->justificativa_recusa = $request->input('justificativa_recusa');
         $avaliacao->save();
-        return redirect()->back()->with('success', 'Avaliação recusada!');
+        return redirect()->back()->with('success', 'Avaliação recusada com justificativa!');
     }
 }
