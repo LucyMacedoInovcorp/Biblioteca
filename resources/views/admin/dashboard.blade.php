@@ -23,6 +23,14 @@
                         <p class="text-gray-200 text-sm">Gerencie o catálogo de livros da biblioteca.</p>
                     </div>
                 </a>
+                <!-- Card: Avaliações Suspensas -->
+                <a href="{{ route('avaliacoes.suspensas') }}" class="card bg-base-100 shadow-xl image-full hover:shadow-2xl transition-shadow duration-300">
+                    <figure><img src="https://placehold.co/600x400/6366F1/ffffff?text=Suspensas" alt="Avaliações Suspensas" /></figure>
+                    <div class="card-body justify-end">
+                        <h2 class="card-title text-white">📝 Avaliações Suspensas</h2>
+                        <p class="text-gray-200 text-sm">Acesse e aprove ou recuse avaliações de livros enviadas pelos cidadãos.</p>
+                    </div>
+                </a>
             </div>
         </div>
         @endif

@@ -5,8 +5,24 @@
 
 <div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
     <h2 class="text-2xl font-bold mb-6 text-center">✍️ Avaliação do Livro</h2>
+    @if(session('success'))
+        <div class="mb-4" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; padding: 0.75rem 1rem; border-radius: 0.375rem;">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-error mb-4">
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="{{ route('avaliacoes.store') }}" method="POST" class="space-y-6">
         @csrf
+        <input type="hidden" name="livro_id" value="{{ $livro_id }}">
+        <input type="hidden" name="requisicao_id" value="{{ $requisicao_id }}">
         <!-- Bloco de texto para avaliação -->
         <div class="form-control">
             <label for="review" class="label font-semibold">Sua avaliação</label>

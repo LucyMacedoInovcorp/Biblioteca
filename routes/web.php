@@ -9,6 +9,7 @@ use App\Http\Controllers\BookSearchController;
 //MAIL TESTE
 use Illuminate\Support\Facades\Mail;
 //AVALIAÇÕES
+use App\Http\Controllers\AvaliacaoController;
 use App\Http\Controllers\ReviewController;
 
 
@@ -122,8 +123,14 @@ Route::post('/books/store-from-api', [BibliController::class, 'storeFromApi'])
 
 
 /* --------------------AVALIAÇÕES--------------------*/
-Route::get('/avaliacoes/create', [ReviewController::class, 'createAvaliacao'])->name('avaliacoes.create');
+Route::get('/avaliacoes/create', [AvaliacaoController::class, 'create'])->name('avaliacoes.create');
 // Salvar avaliação
-Route::post('/avaliacoes', [ReviewController::class, 'storeAvaliacao'])->name('avaliacoes.store');
+Route::post('/avaliacoes', [AvaliacaoController::class, 'store'])->name('avaliacoes.store');
 
- 
+// Rotas para avaliações suspensas
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/avaliacoes/suspensas', [AvaliacaoController::class, 'pendentes'])->name('avaliacoes.suspensas');
+    Route::post('/avaliacoes/{id}/suspender', [AvaliacaoController::class, 'suspender'])->name('avaliacoes.suspender');
+    Route::post('/avaliacoes/{id}/ativar', [AvaliacaoController::class, 'ativar'])->name('avaliacoes.ativar');
+    Route::post('/avaliacoes/{id}/recusar', [AvaliacaoController::class, 'recusar'])->name('avaliacoes.recusar');
+});

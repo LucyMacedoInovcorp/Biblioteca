@@ -129,7 +129,16 @@
             <!-- Avaliação -->
               <td class="@if(!auth()->check() || auth()->user()->is_admin) hidden @endif">
               @if(!$req->ativo && $req->livro && auth()->check() && !auth()->user()->is_admin && auth()->user()->id === $req->user_id)
-              <a href="{{ route('avaliacoes.create', ['livro_id' => $req->livro->id, 'requisicao_id' => $req->id]) }}" style="background-color: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; padding: 0.25rem 0.75rem; border-radius: 0.25rem; text-decoration: none; display: inline-block;">Avaliar</a>
+                @php
+                  $jaAvaliada = \App\Models\Avaliacao::where('user_id', auth()->user()->id)
+                    ->where('requisicao_id', $req->id)
+                    ->exists();
+                @endphp
+                @if($jaAvaliada)
+                  <span style="background-color: #fef9c3; color: #92400e; border: 1px solid #fde68a; padding: 0.25rem 0.75rem; border-radius: 0.25rem; display: inline-block;">Avaliado</span>
+                @else
+                  <a href="{{ route('avaliacoes.create', ['livro_id' => $req->livro->id, 'requisicao_id' => $req->id]) }}" style="background-color: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; padding: 0.25rem 0.75rem; border-radius: 0.25rem; text-decoration: none; display: inline-block;">Avaliar</a>
+                @endif
               @endif
             </td>
 
