@@ -49,7 +49,7 @@ class AvaliacaoController extends Controller
     public function pendentes()
     {
     $avaliacoes = Avaliacao::where('status', 'suspenso')->get();
-        return view('avaliacoes.pendentes', compact('avaliacoes'));
+    return view('avaliacoes.suspensas', compact('avaliacoes'));
     }
 
     // Aprovar avaliação

@@ -130,7 +130,7 @@ Route::post('/avaliacoes', [AvaliacaoController::class, 'store'])->name('avaliac
 // Rotas para avaliações suspensas
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/avaliacoes/suspensas', [AvaliacaoController::class, 'pendentes'])->name('avaliacoes.suspensas');
-    Route::post('/avaliacoes/{id}/suspender', [AvaliacaoController::class, 'suspender'])->name('avaliacoes.suspender');
-    Route::post('/avaliacoes/{id}/ativar', [AvaliacaoController::class, 'ativar'])->name('avaliacoes.ativar');
-    Route::post('/avaliacoes/{id}/recusar', [AvaliacaoController::class, 'recusar'])->name('avaliacoes.recusar');
+    Route::post('/avaliacoes/suspensas/{id}/aprovar', [AvaliacaoController::class, 'aprovar'])->name('avaliacoes.suspensas.aprovar');
+    Route::post('/avaliacoes/suspensas/{id}/recusar', [AvaliacaoController::class, 'rejeitar'])->name('avaliacoes.suspensas.recusar');
 });
+
