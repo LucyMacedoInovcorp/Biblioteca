@@ -8,6 +8,8 @@ use App\Http\Controllers\RequisicaoController;
 use App\Http\Controllers\BookSearchController;
 //MAIL TESTE
 use Illuminate\Support\Facades\Mail;
+//AVALIAÇÕES
+use App\Http\Controllers\ReviewController;
 
 
 Route::get('/', function () {
@@ -15,7 +17,6 @@ Route::get('/', function () {
 });
 
 /* --------------------LIVROS--------------------*/
-// ----------------- LIVROS -----------------
 // CREATE
 Route::get('/livros/create', [BibliController::class, 'createLivro']);
 Route::post('/livros', [BibliController::class, 'storeLivro']);
@@ -120,7 +121,9 @@ Route::post('/books/store-from-api', [BibliController::class, 'storeFromApi'])
     ->name('books.storeFromApi');
 
 
-
-
+/* --------------------AVALIAÇÕES--------------------*/
+Route::get('/avaliacoes/create', [ReviewController::class, 'createAvaliacao'])->name('avaliacoes.create');
+// Salvar avaliação
+Route::post('/avaliacoes', [ReviewController::class, 'storeAvaliacao'])->name('avaliacoes.store');
 
  

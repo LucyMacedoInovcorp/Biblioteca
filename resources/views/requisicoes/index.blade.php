@@ -38,6 +38,7 @@
             <th>📌 Status</th>
             <th>📗 Disponibilidade</th>
             <th class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">⚙️ Ações</th>
+            <th class="@if(!auth()->check() || auth()->user()->is_admin) hidden @endif">✍️ Avaliação</th>
           </tr>
         </thead>
         <tbody>
@@ -85,13 +86,9 @@
             <!-- Prazo de devolução -->
             <td>
               @if($req->prazo_devolucao->isPast())
-              <span class="badge badge-error">
                 Vencido ({{ $req->prazo_devolucao->format('d/m/Y') }})
-              </span>
               @else
-              <span class="badge badge-success">
                 {{ $req->prazo_devolucao->format('d/m/Y') }}
-              </span>
               @endif
             </td>
 
@@ -104,20 +101,18 @@
             
             <td>
               @if($req->ativo)
-              <span class="badge badge-success">Ativo</span>
+                Ativo
               @else
-              <span class="badge badge-error">Finalizado</span>
+                Finalizado
               @endif
             </td>
 
             <!-- Disponibilidade -->
             <td>
               @if($req->livro)
-              <span class="badge {{ $req->livro->disponivel ? 'badge-success' : 'badge-error' }}">
-                {{ $req->livro->disponivel ? '🟢 Disponível' : '🔴 Indisponível' }}
-              </span>
+                {{ $req->livro->disponivel ? 'Disponível' : 'Indisponível' }}
               @else
-              
+                —
               @endif
             </td>
 
@@ -130,6 +125,14 @@
               </form>
               @endif
             </td>
+
+            <!-- Avaliação -->
+              <td class="@if(!auth()->check() || auth()->user()->is_admin) hidden @endif">
+              @if(!$req->ativo && $req->livro && auth()->check() && !auth()->user()->is_admin && auth()->user()->id === $req->user_id)
+              <a href="{{ route('avaliacoes.create', ['livro_id' => $req->livro->id, 'requisicao_id' => $req->id]) }}" style="background-color: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; padding: 0.25rem 0.75rem; border-radius: 0.25rem; text-decoration: none; display: inline-block;">Avaliar</a>
+              @endif
+            </td>
+
           </tr>
           @endforeach
         </tbody>
