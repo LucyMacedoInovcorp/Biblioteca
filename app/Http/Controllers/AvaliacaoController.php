@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Avaliacao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\ReviewResultMail;
+use Illuminate\Support\Facades\Mail;
 
 class AvaliacaoController extends Controller
 {
@@ -62,19 +64,29 @@ class AvaliacaoController extends Controller
     // Aprovar avaliação
     public function aprovar($id)
     {
-        $avaliacao = Avaliacao::findOrFail($id);
-        $avaliacao->status = 'ativo';
-        $avaliacao->save();
-        return redirect()->back()->with('success', 'Avaliação aprovada!');
+    $avaliacao = Avaliacao::findOrFail($id);
+    $avaliacao->status = 'ativo';
+    $avaliacao->save();
+
+    // Enviar email para o cidadão informando que a avaliação foi aprovada
+    $user = $avaliacao->user;
+    \Mail::to($user->email)->send(new \App\Mail\ReviewResultMail('ativa'));
+
+    return redirect()->back()->with('success', 'Avaliação aprovada!');
     }
 
     // Rejeitar avaliação
     public function rejeitar(Request $request, $id)
     {
-        $avaliacao = Avaliacao::findOrFail($id);
-        $avaliacao->status = 'recusado';
-        $avaliacao->justificativa_recusa = $request->input('justificativa_recusa');
-        $avaliacao->save();
-        return redirect()->back()->with('success', 'Avaliação recusada com justificativa!');
+    $avaliacao = Avaliacao::findOrFail($id);
+    $avaliacao->status = 'recusado';
+    $avaliacao->justificativa_recusa = $request->input('justificativa_recusa');
+    $avaliacao->save();
+
+    // Enviar email para o cidadão informando que a avaliação foi recusada e a justificativa
+    $user = $avaliacao->user;
+    \Mail::to($user->email)->send(new \App\Mail\ReviewResultMail('recusada', $avaliacao->justificativa_recusa));
+
+    return redirect()->back()->with('success', 'Avaliação recusada com justificativa!');
     }
 }
