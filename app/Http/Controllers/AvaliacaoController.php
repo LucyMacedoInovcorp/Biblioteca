@@ -33,19 +33,26 @@ class AvaliacaoController extends Controller
             return redirect()->back()->withErrors(['Você já avaliou esta requisição.']);
         }
 
-        Avaliacao::create([
-            'user_id' => Auth::id(),
-            'livro_id' => $request->livro_id,
-            'requisicao_id' => $request->requisicao_id,
-            'review' => $request->review,
-            'rating' => $request->rating,
-            'status' => 'suspenso',
-        ]);
 
-        return redirect()->back()->with('success', 'Avaliação enviada para aprovação.');
+            $avaliacao = Avaliacao::create([
+                'user_id' => Auth::id(),
+                'livro_id' => $request->livro_id,
+                'requisicao_id' => $request->requisicao_id,
+                'review' => $request->review,
+                'rating' => $request->rating,
+                'status' => 'suspenso',
+            ]);
+
+            // Enviar e-mail para administradores usando Mailable
+            $admins = \App\Models\User::where('is_admin', true)->pluck('email');
+            foreach ($admins as $adminEmail) {
+                \Mail::to($adminEmail)->send(new \App\Mail\SendReviewMail($avaliacao));
+            }
+
+            return redirect()->back()->with('success', 'Avaliação enviada!');
 }
 
-    // Listar avaliações pendentes para o admin aprovar
+    /*----------Listar avaliações pendentes para o admin aprovar----------*/
     public function pendentes()
     {
     $avaliacoes = Avaliacao::where('status', 'suspenso')->get();
@@ -56,7 +63,7 @@ class AvaliacaoController extends Controller
     public function aprovar($id)
     {
         $avaliacao = Avaliacao::findOrFail($id);
-    $avaliacao->status = 'ativo';
+        $avaliacao->status = 'ativo';
         $avaliacao->save();
         return redirect()->back()->with('success', 'Avaliação aprovada!');
     }
