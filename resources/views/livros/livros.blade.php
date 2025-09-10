@@ -3,19 +3,19 @@
 @section('content')
 
 @if (session('success'))
-    <div class="alert alert-success shadow-lg mb-4">
-        <div>
-            <span>{{ session('success') }}</span>
-        </div>
-    </div>
+<div class="alert alert-success shadow-lg mb-4">
+  <div>
+    <span>{{ session('success') }}</span>
+  </div>
+</div>
 @endif
 
 @if (session('error'))
-    <div class="alert alert-error shadow-lg mb-4">
-        <div>
-            <span>{{ session('error') }}</span>
-        </div>
-    </div>
+<div class="alert alert-error shadow-lg mb-4">
+  <div>
+    <span>{{ session('error') }}</span>
+  </div>
+</div>
 @endif
 
 
@@ -74,7 +74,7 @@
           @foreach($editoras as $editora)
           <option value="{{ $editora->id }}">{{ $editora->nome }}</option>
           @endforeach
-        </select>   
+        </select>
       </div>
       <!-- Autores -->
       <div class="form-control">
@@ -178,7 +178,12 @@
               <td>
                 @if($livro->requisicoes()->where('ativo', true)->exists())
                 <!-- Já tem requisição ativa -->
-                <span class="badge badge-warning">Indisponível</span>
+                <form action="{{ route('livros.notificar-disponibilidade', $livro->id) }}" method="POST">
+                  @csrf
+                  <button type="submit" class="btn btn-sm btn-warning">
+                    Notificar disponibilidade
+                  </button>
+                </form>
                 @else
                 @guest
                 <!-- Visitante: livro disponível mas precisa logar -->

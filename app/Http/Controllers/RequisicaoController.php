@@ -8,6 +8,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\NovaRequisicaoMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
+use App\Mail\LivroDisponivelMail;
+
+
+
+
 
 class RequisicaoController extends Controller
 {
@@ -44,9 +50,9 @@ class RequisicaoController extends Controller
         $admins = User::where('is_admin', true)->pluck('email')->toArray();
 
         // Email para o utilizador
-        Mail::to($user->email)  
+        Mail::to($user->email)
             ->send(new NovaRequisicaoMail($requisicao));
-            
+
         // Email para cada administrador
         foreach ($admins as $adminEmail) {
             Mail::to($adminEmail)
@@ -107,6 +113,14 @@ class RequisicaoController extends Controller
         if ($req->livro) {
             $req->livro->disponivel = true;
             $req->livro->save();
+        }
+
+
+        if ($req->livro) {
+            foreach ($req->livro->notificacoesDisponibilidade as $notificacao) {
+                Mail::to($notificacao->user->email)->send(new LivroDisponivelMail($req->livro));
+                $notificacao->delete(); 
+            }
         }
 
         return back()->with('success', '✅ Devolução confirmada!');

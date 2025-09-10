@@ -47,4 +47,10 @@ class Livro extends Model
     {
         return $this->hasMany(\App\Models\Avaliacao::class, 'livro_id');
     }
+
+    // Relação com Notificações de Disponibilidade
+    public function notificacoesDisponibilidade()
+    {
+        return $this->hasMany(NotificacaoDisponibilidade::class);
+    }
 }

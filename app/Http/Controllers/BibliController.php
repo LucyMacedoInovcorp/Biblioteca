@@ -37,38 +37,38 @@ class BibliController extends Controller
     }
 
     public function storeLivro(Request $request)
-{
-    $request->validate([
-        'nome' => 'required|string|max:255',
-        'ISBN' => 'nullable|string|max:255',
-        'bibliografia' => 'nullable|string',
-        'preco' => 'required|numeric',
-        'editoras' => 'required|array|min:1',
-        'autores' => 'required|array|min:1',
-    ]);
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'ISBN' => 'nullable|string|max:255',
+            'bibliografia' => 'nullable|string',
+            'preco' => 'required|numeric',
+            'editoras' => 'required|array|min:1',
+            'autores' => 'required|array|min:1',
+        ]);
 
-    $livro = new Livro;
-    $livro->nome         = $request->nome;
-    $livro->ISBN         = $request->ISBN;
-    $livro->bibliografia = $request->bibliografia;
-    $livro->preco        = $request->preco;
-    $livro->editora_id   = $request->editoras[0];
+        $livro = new Livro;
+        $livro->nome         = $request->nome;
+        $livro->ISBN         = $request->ISBN;
+        $livro->bibliografia = $request->bibliografia;
+        $livro->preco        = $request->preco;
+        $livro->editora_id   = $request->editoras[0];
 
-    if ($request->hasFile('imagemcapa')) {
-        $path = $request->file('imagemcapa')->store('capas', 'public');
-        $livro->imagemcapa = '/storage/' . $path;
-    } else {
-        $livro->imagemcapa = '/images/default-book.png';
+        if ($request->hasFile('imagemcapa')) {
+            $path = $request->file('imagemcapa')->store('capas', 'public');
+            $livro->imagemcapa = '/storage/' . $path;
+        } else {
+            $livro->imagemcapa = '/images/default-book.png';
+        }
+
+        $livro->save();
+
+        if ($request->filled('autores')) {
+            $livro->autores()->sync($request->autores);
+        }
+
+        return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
     }
-
-    $livro->save();
-
-    if ($request->filled('autores')) {
-        $livro->autores()->sync($request->autores);
-    }
-
-    return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
-}
 
     public function editLivro($id)
     {
@@ -109,6 +109,15 @@ class BibliController extends Controller
         return redirect('/livros/create')->with('msg', 'Livro excluído com sucesso!');
     }
 
+    public function notificarDisponibilidade(Request $request, Livro $livro)
+    {
+         $user = Auth::user();
+        // Evita duplicidade
+        if (!$livro->notificacoesDisponibilidade()->where('user_id', $user->id)->exists()) {
+            $livro->notificacoesDisponibilidade()->create(['user_id' => $user->id]);
+        }
+        return back()->with('success', 'Você será notificado quando o livro estiver disponível.');
+    }
 
     // ---------- AUTORES ----------
     public function createAutor()
@@ -125,7 +134,7 @@ class BibliController extends Controller
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('autores', 'public');
             $autor->foto = '/storage/' . $path;
-        }else {
+        } else {
             // Caminho relativo à pasta public
             $autor->foto = '/images/default-book.png';
         }
@@ -235,46 +244,45 @@ class BibliController extends Controller
 
 
 
-public function storeFromApi(Request $request)
-{
-    $validatedData = $request->validate([
-        'title' => 'required|string|max:255',
-        'isbn' => 'nullable|string|max:255',
-        'authors' => 'nullable|array',
-        'publisher' => 'nullable|string|max:255',
-        'description' => 'nullable|string',
-        'cover_image' => 'nullable|string|max:255',
-    ]);
+    public function storeFromApi(Request $request)
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'isbn' => 'nullable|string|max:255',
+            'authors' => 'nullable|array',
+            'publisher' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'cover_image' => 'nullable|string|max:255',
+        ]);
 
-    // Editora: se não existe, cria com imagem padrão
-    $editora = Editora::firstOrCreate(
-        ['nome' => $validatedData['publisher'] ?? 'Desconhecida'],
-        ['logotipo' => '/images/default-book.png']
-    );
-
-    // Autores: se não existe, cria com imagem padrão
-    $autores = collect($validatedData['authors'] ?? [])->map(function ($nome) {
-        return Autor::firstOrCreate(
-            ['nome' => $nome],
-            ['foto' => '/images/default-book.png']
+        // Editora: se não existe, cria com imagem padrão
+        $editora = Editora::firstOrCreate(
+            ['nome' => $validatedData['publisher'] ?? 'Desconhecida'],
+            ['logotipo' => '/images/default-book.png']
         );
-    });
 
-    // Livro: se não tem capa, usa imagem padrão
-    $imagemCapa = $validatedData['cover_image'] ?: '/images/default-book.png';
+        // Autores: se não existe, cria com imagem padrão
+        $autores = collect($validatedData['authors'] ?? [])->map(function ($nome) {
+            return Autor::firstOrCreate(
+                ['nome' => $nome],
+                ['foto' => '/images/default-book.png']
+            );
+        });
 
-    $livro = Livro::create([
-        'nome' => $validatedData['title'],
-        'ISBN' => $validatedData['isbn'],
-        'bibliografia' => $validatedData['description'],
-        'preco' => 0,
-        'editora_id' => $editora->id,
-        'imagemcapa' => $imagemCapa,
-    ]);
+        // Livro: se não tem capa, usa imagem padrão
+        $imagemCapa = $validatedData['cover_image'] ?: '/images/default-book.png';
 
-    $livro->autores()->sync($autores->pluck('id'));
+        $livro = Livro::create([
+            'nome' => $validatedData['title'],
+            'ISBN' => $validatedData['isbn'],
+            'bibliografia' => $validatedData['description'],
+            'preco' => 0,
+            'editora_id' => $editora->id,
+            'imagemcapa' => $imagemCapa,
+        ]);
 
-    return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
-}
+        $livro->autores()->sync($autores->pluck('id'));
 
+        return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
+    }
 }

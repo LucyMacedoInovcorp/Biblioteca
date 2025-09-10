@@ -134,3 +134,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/avaliacoes/suspensas/{id}/recusar', [AvaliacaoController::class, 'rejeitar'])->name('avaliacoes.suspensas.recusar');
 });
 
+
+/* --------------------AVALIAÇÕES--------------------*/
+Route::post('/livros/{livro}/notificar-disponibilidade', [BibliController::class, 'notificarDisponibilidade'])
+    ->name('livros.notificar-disponibilidade')->middleware('auth');
