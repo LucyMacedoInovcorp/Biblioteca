@@ -53,4 +53,13 @@ class Livro extends Model
     {
         return $this->hasMany(NotificacaoDisponibilidade::class);
     }
+
+    // Método para obter livros relacionados com base na bibliografia FULLTEXT MYSQL
+    public function relacionados($limit = 5)
+    {
+        return Livro::where('id', '!=', $this->id)
+            ->whereRaw("MATCH(bibliografia) AGAINST(? IN NATURAL LANGUAGE MODE)", [$this->bibliografia])
+            ->limit($limit)
+            ->get();
+    }
 }

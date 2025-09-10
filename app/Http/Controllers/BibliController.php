@@ -28,12 +28,13 @@ class BibliController extends Controller
         return view('livros.livros', compact('livros', 'editoras', 'autores'));
     }
 
-    // Para exibir detalhes do livro e suas requisições
+    // Para exibir detalhes do livro e suas requisições + livros relacionados fulltext MYSQL
     public function showLivro($id)
     {
         $livro = Livro::with(['requisicoes.user'])->findOrFail($id);
+        $relacionados = $livro->relacionados(); // <-- Adicione esta linha
 
-        return view('livros.show', compact('livro'));
+        return view('livros.show', compact('livro', 'relacionados'));
     }
 
     public function storeLivro(Request $request)
@@ -111,7 +112,7 @@ class BibliController extends Controller
 
     public function notificarDisponibilidade(Request $request, Livro $livro)
     {
-         $user = Auth::user();
+        $user = Auth::user();
         // Evita duplicidade
         if (!$livro->notificacoesDisponibilidade()->where('user_id', $user->id)->exists()) {
             $livro->notificacoesDisponibilidade()->create(['user_id' => $user->id]);
