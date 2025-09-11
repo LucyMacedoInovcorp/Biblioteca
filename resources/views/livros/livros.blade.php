@@ -27,72 +27,72 @@
       @csrf
       <!-- Capa -->
       <div class="form-control">
-        <label for="imagemcapa" class="label">
-          <span class="label-text font-semibold">Imagem do Livro</span>
-        </label>
-        <input type="file" id="imagemcapa" name="imagemcapa" class="file-input file-input-bordered w-full" />
+      <label for="imagemcapa" class="label">
+        <span class="label-text font-semibold">Imagem do Livro</span>
+      </label>
+      <input type="file" id="imagemcapa" name="imagemcapa" class="file-input file-input-bordered w-full" />
       </div>
       <!-- Nome -->
       <div class="form-control">
-        <label for="nome" class="label">
-          <span class="label-text font-semibold">Nome do Livro</span>
-        </label>
-        <input type="text" id="nome" name="nome" placeholder="Digite o nome do livro"
-          class="input input-bordered w-full" />
+      <label for="nome" class="label">
+        <span class="label-text font-semibold">Nome do Livro</span>
+      </label>
+      <input type="text" id="nome" name="nome" placeholder="Digite o nome do livro"
+        class="input input-bordered w-full" />
       </div>
       <!-- ISBN -->
       <div class="form-control">
-        <label for="ISBN" class="label">
-          <span class="label-text font-semibold">ISBN</span>
-        </label>
-        <input type="text" id="ISBN" name="ISBN" placeholder="Digite o ISBN"
-          class="input input-bordered w-full" />
+      <label for="ISBN" class="label">
+        <span class="label-text font-semibold">ISBN</span>
+      </label>
+      <input type="text" id="ISBN" name="ISBN" placeholder="Digite o ISBN"
+        class="input input-bordered w-full" />
       </div>
       <!-- Bibliografia -->
       <div class="form-control">
-        <label for="bibliografia" class="label">
-          <span class="label-text font-semibold">Bibliografia</span>
-        </label>
-        <textarea id="bibliografia" name="bibliografia" placeholder="Escreva a bibliografia"
-          class="textarea textarea-bordered w-full"></textarea>
+      <label for="bibliografia" class="label">
+        <span class="label-text font-semibold">Bibliografia</span>
+      </label>
+      <textarea id="bibliografia" name="bibliografia" placeholder="Escreva a bibliografia"
+        class="textarea textarea-bordered w-full"></textarea>
       </div>
       <!-- Preço -->
       <div class="form-control">
-        <label for="preco" class="label">
-          <span class="label-text font-semibold">Preço</span>
-        </label>
-        <input type="number" step="0.01" id="preco" name="preco" placeholder="Preço do livro (€)"
-          class="input input-bordered w-full" />
+      <label for="preco" class="label">
+        <span class="label-text font-semibold">Preço</span>
+      </label>
+      <input type="number" step="0.01" id="preco" name="preco" placeholder="Preço do livro (€)"
+        class="input input-bordered w-full" />
       </div>
       <!-- Editora -->
       <div class="form-control">
-        <label for="editoras" class="label">
-          <span class="label-text font-semibold">Editoras</span>
-        </label>
-        <select id="editoras" name="editoras[]" multiple placeholder="Selecione a editora...">
+      <label for="editoras" class="label">
+        <span class="label-text font-semibold">Editoras</span>
+      </label>
+      <select id="editoras" name="editoras[]" multiple placeholder="Selecione a editora...">
 
-          @foreach($editoras as $editora)
-          <option value="{{ $editora->id }}">{{ $editora->nome }}</option>
-          @endforeach
-        </select>
+        @foreach($editoras as $editora)
+        <option value="{{ $editora->id }}">{{ $editora->nome }}</option>
+        @endforeach
+      </select>
       </div>
       <!-- Autores -->
       <div class="form-control">
-        <label for="autores" class="label">
-          <span class="label-text font-semibold">Autores</span>
-        </label>
-        <select id="autores" name="autores[]" multiple placeholder="Selecione autores...">
-          @foreach($autores as $autor)
-          <option value="{{ $autor->id }}">{{ $autor->nome }}</option>
-          @endforeach
-        </select>
+      <label for="autores" class="label">
+        <span class="label-text font-semibold">Autores</span>
+      </label>
+      <select id="autores" name="autores[]" multiple placeholder="Selecione autores...">
+        @foreach($autores as $autor)
+        <option value="{{ $autor->id }}">{{ $autor->nome }}</option>
+        @endforeach
+      </select>
       </div>
       <!-- Imagem padrão -->
       <input type="hidden" name="imagem_padrao" value="default-book.png">
 
       <!-- Botão -->
-      <div class="form-control">
-        <button type="submit" class="btn btn-primary w-full">➕ Incluir livro</button>
+      <div class="form-control mt-20">
+      <button type="submit" class="btn btn-primary w-full">➕ Incluir livro</button>
       </div>
     </form>
 
