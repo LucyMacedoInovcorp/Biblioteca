@@ -91,15 +91,18 @@
             <div class="card bg-base-100 shadow-md mt-8">
                 <div class="card-body">
                     <h3 class="text-2xl font-semibold mb-4">📚 Livros Relacionados</h3>
-                    <ul class="space-y-2">
+                    <div class="flex flex-wrap gap-6 justify-start">
                         @foreach($relacionados as $rel)
-                        <li>
-                            <a href="{{ route('livros.show', $rel->id) }}" class="text-blue-600 hover:underline">
-                                {{ $rel->nome }}
+                        <div class="bg-base-200 shadow rounded-lg p-2 flex flex-col items-center w-32">
+                            <a href="{{ route('livros.show', $rel->id) }}" class="w-full flex flex-col items-center">
+                                <img src="{{ asset($rel->imagemcapa ?? 'images/livro-default.png') }}"
+                                    alt="{{ $rel->nome }}"
+                                    class="w-24 h-36 object-cover mb-2 rounded">
+                                <div class="text-center font-semibold text-blue-700 hover:underline text-sm truncate w-full">{{ $rel->nome }}</div>
                             </a>
-                        </li>
+                        </div>
                         @endforeach
-                    </ul>
+                    </div>
                 </div>
             </div>
             @endif
