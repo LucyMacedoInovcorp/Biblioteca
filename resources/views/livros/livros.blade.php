@@ -2,21 +2,16 @@
 @section('title', 'Livros')
 @section('content')
 
-@if (session('success'))
-<div class="alert alert-success shadow-lg mb-4">
-  <div>
-    <span>{{ session('success') }}</span>
+
+
+@if(session('success') || session('msg'))
+  <div class="mb-4" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; 
+  padding: 0.75rem 1rem; border-radius: 0.375rem;">
+    {{ session('success') ?? session('msg') }}
   </div>
-</div>
 @endif
 
-@if (session('error'))
-<div class="alert alert-error shadow-lg mb-4">
-  <div>
-    <span>{{ session('error') }}</span>
-  </div>
-</div>
-@endif
+
 
 
 @if(auth()->check() && auth()->user()->is_admin)
@@ -175,35 +170,53 @@
               </td>
 
 
+
+
               <td>
                 @if($livro->requisicoes()->where('ativo', true)->exists())
-                <!-- Já tem requisição ativa -->
-                <form action="{{ route('livros.notificar-disponibilidade', $livro->id) }}" method="POST">
-                  @csrf
-                  <button type="submit" class="btn btn-sm btn-warning">
-                    Notificar disponibilidade
-                  </button>
-                </form>
-                @else
-                @guest
-                <!-- Visitante: livro disponível mas precisa logar -->
-                <a href="{{ route('login') }}" class="btn btn-sm btn-outline">
-                  🔑 Requisitar
-                </a>
-                @else
-                <!-- Usuário logado -->
-                @if(auth()->user()->requisicoes()->where('ativo', true)->count() < 3)
-                  <form action="{{ route('livros.requisitar', $livro->id) }}" method="POST">
-                  @csrf
-                  <button type="submit" class="btn btn-sm btn-success">
-                    📥 Requisitar
-                  </button>
-                  </form>
+                  @php
+                    $requisicaoAtiva = $livro->requisicoes()->where('ativo', true)->first();
+                    $notificacaoAtiva = false;
+                    $isDonoRequisicao = auth()->check() && $requisicaoAtiva && $requisicaoAtiva->user_id === auth()->id();
+                    if(auth()->check()) {
+                      $notificacaoAtiva = $livro->notificacoesDisponibilidade()->where('user_id', auth()->id())->exists();
+                    }
+                  @endphp
+
+                  @if($isDonoRequisicao)
+                    <button class="btn btn-sm btn-warning opacity-60 cursor-not-allowed" disabled>Em curso</button>
                   @else
-                  <span class="badge badge-error whitespace-nowrap">Limite atingido</span>
+                    @if($notificacaoAtiva)
+                      <button class="btn btn-sm btn-warning opacity-60 cursor-not-allowed" disabled>Notificação em espera</button>
+                    @else
+                      <form action="{{ route('livros.notificar-disponibilidade', $livro->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-warning">
+                          Notificar disponibilidade
+                        </button>
+                      </form>
+                    @endif
+                  @endif
+                @else
+                  @guest
+                  <!-- Visitante: livro disponível mas precisa logar -->
+                  <a href="{{ route('login') }}" class="btn btn-sm btn-outline">
+                    🔑 Requisitar
+                  </a>
+                  @else
+                  <!-- Usuário logado -->
+                  @if(auth()->user()->requisicoes()->where('ativo', true)->count() < 3)
+                    <form action="{{ route('livros.requisitar', $livro->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-success">
+                      📥 Requisitar
+                    </button>
+                    </form>
+                  @else
+                    <span class="badge badge-error whitespace-nowrap">Limite atingido</span>
                   @endif
                   @endguest
-                  @endif
+                @endif
               </td>
 
 

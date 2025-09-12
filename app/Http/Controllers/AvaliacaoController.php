@@ -5,6 +5,7 @@ use App\Models\Avaliacao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\ReviewResultMail;
+use App\Models\Requisicao;
 use Illuminate\Support\Facades\Mail;
 
 class AvaliacaoController extends Controller
@@ -35,23 +36,22 @@ class AvaliacaoController extends Controller
             return redirect()->back()->withErrors(['Você já avaliou esta requisição.']);
         }
 
+        $avaliacao = Avaliacao::create([
+            'user_id' => Auth::id(),
+            'livro_id' => $request->livro_id,
+            'requisicao_id' => $request->requisicao_id,
+            'review' => $request->review,
+            'rating' => $request->rating,
+            'status' => 'suspenso',
+        ]);
 
-            $avaliacao = Avaliacao::create([
-                'user_id' => Auth::id(),
-                'livro_id' => $request->livro_id,
-                'requisicao_id' => $request->requisicao_id,
-                'review' => $request->review,
-                'rating' => $request->rating,
-                'status' => 'suspenso',
-            ]);
+        // Enviar e-mail para administradores usando Mailable
+        $admins = \App\Models\User::where('is_admin', true)->pluck('email');
+        foreach ($admins as $adminEmail) {
+            \Mail::to($adminEmail)->send(new \App\Mail\SendReviewMail($avaliacao));
+        }
 
-            // Enviar e-mail para administradores usando Mailable
-            $admins = \App\Models\User::where('is_admin', true)->pluck('email');
-            foreach ($admins as $adminEmail) {
-                \Mail::to($adminEmail)->send(new \App\Mail\SendReviewMail($avaliacao));
-            }
-
-            return redirect()->back()->with('success', 'Avaliação enviada!');
+        return redirect()->route('requisicoes.index')->with('success', 'Avaliação enviada!');
 }
 
     /*----------Listar avaliações pendentes para o admin aprovar----------*/
@@ -70,7 +70,7 @@ class AvaliacaoController extends Controller
 
     // Enviar email para o cidadão informando que a avaliação foi aprovada
     $user = $avaliacao->user;
-    \Mail::to($user->email)->send(new \App\Mail\ReviewResultMail('ativa'));
+    \Mail::to($user->email)->send(new \App\Mail\ReviewResultMail('ativa', null, $avaliacao));
 
     return redirect()->back()->with('success', 'Avaliação aprovada!');
     }
@@ -85,7 +85,7 @@ class AvaliacaoController extends Controller
 
     // Enviar email para o cidadão informando que a avaliação foi recusada e a justificativa
     $user = $avaliacao->user;
-    \Mail::to($user->email)->send(new \App\Mail\ReviewResultMail('recusada', $avaliacao->justificativa_recusa));
+    \Mail::to($user->email)->send(new \App\Mail\ReviewResultMail('recusada', $avaliacao->justificativa_recusa, $avaliacao));
 
     return redirect()->back()->with('success', 'Avaliação recusada com justificativa!');
     }

@@ -117,7 +117,9 @@ class BibliController extends Controller
         if (!$livro->notificacoesDisponibilidade()->where('user_id', $user->id)->exists()) {
             $livro->notificacoesDisponibilidade()->create(['user_id' => $user->id]);
         }
-        return back()->with('success', 'Você será notificado quando o livro estiver disponível.');
+
+        return back()->with('success', '✉️ Você será notificado quando o livro estiver disponível.');
+
     }
 
     // ---------- AUTORES ----------

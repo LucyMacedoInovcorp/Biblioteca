@@ -22,44 +22,34 @@ class RequisicaoController extends Controller
      */
     public function store(Livro $livro)
     {
-        // 1. Verifica autenticação
         if (!Auth::check()) {
-            return back()->with('error', '❌ Você precisa estar autenticado para requisitar um livro.');
+            return redirect('/livros/create')->withErrors(['error' => '❌ Você precisa estar autenticado para requisitar um livro.']);
         }
 
         $user = Auth::user();
 
-        // 2. Verificar limite de 3 livros ativos
         if ($user->requisicoes()->where('ativo', true)->count() >= 3) {
-            return back()->with('error', '❌ Você já tem 3 livros ativos requisitados.');
+            return redirect('/livros/create')->withErrors(['error' => '❌ Você já tem 3 livros ativos requisitados.']);
         }
 
-        // 3. Verificar se o livro já está requisitado
         if ($livro->requisicoes()->where('ativo', true)->exists()) {
-            return back()->with('error', '❌ Este livro já está requisitado por outro usuário.');
+            return redirect('/livros/create')->withErrors(['error' => '❌ Este livro já está requisitado por outro usuário.']);
         }
 
-        // 4. Criar a requisição
         $requisicao = Requisicao::create([
             'user_id'  => $user->id,
             'livro_id' => $livro->id,
             'ativo'    => true,
         ]);
 
-        // 5. Enviar e-mails
         $admins = User::where('is_admin', true)->pluck('email')->toArray();
 
-        // Email para o utilizador
-        Mail::to($user->email)
-            ->send(new NovaRequisicaoMail($requisicao));
-
-        // Email para cada administrador
+        Mail::to($user->email)->send(new NovaRequisicaoMail($requisicao));
         foreach ($admins as $adminEmail) {
-            Mail::to($adminEmail)
-                ->send(new NovaRequisicaoMail($requisicao));
+            Mail::to($adminEmail)->send(new NovaRequisicaoMail($requisicao));
         }
 
-        return back()->with('success', '✅ Requisição realizada com sucesso! Um e-mail de confirmação foi enviado.');
+    return redirect('/livros/create')->with('success', '✅ Requisição realizada com sucesso! Um e-mail de confirmação foi enviado.');
     }
 
     /**

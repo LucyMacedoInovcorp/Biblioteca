@@ -2,6 +2,12 @@
 @section('title', 'Requisições')
 @section('content')
 
+@if(session('success'))
+  <div class="mb-4" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; padding: 0.75rem 1rem; border-radius: 0.375rem;">
+    {{ session('success') }}
+  </div>
+@endif
+
 <!-- Indicadores -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
   <div class="card bg-base-100 shadow p-4 text-center">

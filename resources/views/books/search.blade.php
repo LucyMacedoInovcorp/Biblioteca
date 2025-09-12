@@ -2,6 +2,11 @@
 @section('title', 'Buscar Livros')
 @section('content')
 
+@if(session('success'))
+  <div class="mb-4" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; 
+  padding: 0.75rem 1rem; border-radius: 0.375rem;">
+  </div>
+@endif
 
 <div class="form-control mt-6 mb-6">
   <div class="w-full max-w-md mx-auto rounded-xl border border-base-300 

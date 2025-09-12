@@ -20,5 +20,7 @@ Foi recebida uma nova avaliação! ✅
 ---
 
 Aguardamos a análise da avaliação!<br>
+[Avaliações Suspensas]({{ url('avaliacoes/suspensas') }})
+<br>
 {{ config('app.name') }}
 @endcomponent
