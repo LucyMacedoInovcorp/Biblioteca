@@ -17,6 +17,22 @@
                 </span>
             </p>
 
+
+            <!-- Botão Adicionar ao Carrinho -->
+            <div class="flex items-center gap-4 mt-6 mb-6">
+                <span class="text-xl font-bold text-green-700">
+                    💰 {{ number_format($livro->preco, 2, ',', '.') }} €
+                </span>
+                <form action="{{ route('carrinho.adicionar', $livro->id) }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        class="btn btn-primary btn-lg shadow-xl transition duration-200 ease-in-out transform hover:scale-105 flex items-center gap-2 hover:shadow-2xl focus:shadow-2xl">
+                        🛒 Adicionar ao Carrinho
+                    </button>
+                </form>
+            </div>
+
+
             <!-- Histórico de requisições -->
             <div class="card bg-base-100 shadow-md">
                 <div class="card-body p-0">
@@ -42,9 +58,9 @@
                                     <td>{{ $req->data_recepcao ? $req->data_recepcao->format('d/m/Y') : '—' }}</td>
                                     <td>
                                         @if($req->ativo)
-                                        <span class="badge badge-success">Ativo</span>
+                                        <span >Ativo</span>
                                         @else
-                                        <span class="badge badge-error">Finalizado</span>
+                                        <span >Finalizado</span>
                                         @endif
                                     </td>
                                 </tr>

@@ -86,4 +86,10 @@ class User extends Authenticatable
     {
         return $this->is_admin;
     }
+
+
+    /*---------------------CARRINHO-------------------------------*/
+    public function carrinho() {
+    return $this->hasOne(Carrinho::class);
+}
 }

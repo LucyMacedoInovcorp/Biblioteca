@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Mail;
 //AVALIAÇÕES
 use App\Http\Controllers\AvaliacaoController;
 use App\Http\Controllers\ReviewController;
+//CARRINHO
+use App\Http\Controllers\CarrinhoController;
 
 
 Route::get('/', function () {
@@ -138,3 +140,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 /* --------------------AVALIAÇÕES--------------------*/
 Route::post('/livros/{livro}/notificar-disponibilidade', [BibliController::class, 'notificarDisponibilidade'])
     ->name('livros.notificar-disponibilidade')->middleware('auth');
+
+/* --------------------CARRINHO--------------------*/
+//Adicionar ao carrinho
+Route::post('/carrinho/adicionar/{livro}', [CarrinhoController::class, 'adicionar'])->name('carrinho.adicionar');
+//Listar itens do carrinho
+Route::get('/carrinho', [CarrinhoController::class, 'listar'])->name('carrinho.listar');
+//Remover item do carrinho
+Route::delete('/carrinho/remover/{item}', [CarrinhoController::class, 'remover'])->name('carrinho.remover');
+//Atualizar quantidade do item no carrinho
+Route::put('/carrinho/atualizar/{item}', [CarrinhoController::class, 'atualizar'])->name('carrinho.atualizar');
