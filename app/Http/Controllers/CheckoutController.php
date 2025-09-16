@@ -73,6 +73,7 @@ class CheckoutController extends Controller
             // Limpar o carrinho
             $carrinho->itens()->delete();
         }
-    return redirect('/meus-pedidos')->with('success', 'Pedido #' . $encomenda->id . ' realizado com sucesso!');
+        // Redirecionar para pagamento Stripe
+        return redirect()->route('encomendas.pagar', $encomenda->id);
     }
 }

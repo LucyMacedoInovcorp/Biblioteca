@@ -14,7 +14,8 @@
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6.4",
         "mailjet/laravel-mailjet": "^3.1",
-        "rappasoft/laravel-livewire-tables": "^3.7"
+        "rappasoft/laravel-livewire-tables": "^3.7",
+        "stripe/stripe-php": "^17.6"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6",

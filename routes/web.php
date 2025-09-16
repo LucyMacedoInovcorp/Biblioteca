@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -170,4 +169,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 // Página de pedidos do usuário autenticado
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meus-pedidos', [App\Http\Controllers\EncomendaController::class, 'meusPedidos'])->name('encomendas.meus');
+});
+
+/* --------------------CHECKOUT STRIPE--------------------*/
+    Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/encomendas/{encomenda}/pagar', [App\Http\Controllers\CheckoutStripeController::class, 'pagar'])->name('encomendas.pagar');
+    Route::get('/checkout/success', [App\Http\Controllers\CheckoutStripeController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout/cancel', [App\Http\Controllers\CheckoutStripeController::class, 'cancel'])->name('checkout.cancel');
 });

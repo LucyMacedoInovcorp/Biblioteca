@@ -14,7 +14,9 @@ class Livro extends Model
         'bibliografia',
         'preco',
         'editora_id',
-        'imagemcapa'
+        'imagemcapa',
+        'stripe_product_id',
+        'stripe_price_id',
     ];
 
 

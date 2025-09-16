@@ -24,9 +24,9 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Data</th>
+                            <th scope="col">Livros</th>
                             <th scope="col">Status</th>
                             <th scope="col">Total</th>
-                            <!-- <th scope="col">Itens</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -34,15 +34,19 @@
                         <tr class="hover">
                             <td class="font-semibold">{{ $encomenda->id }}</td>
                             <td>{{ $encomenda->created_at->format('d/m/Y H:i') }}</td>
-                            <td>{{ ucfirst($encomenda->status) }}</td>
+                            <td>
+                                @foreach($encomenda->itens as $item)
+                                    {{ $item->livro->nome ?? 'Livro removido' }}@if(!$loop->last), @endif
+                                @endforeach
+                            </td>
+                            <td>
+                                @if($encomenda->status === 'pendente')
+                                    <a href="{{ route('encomendas.pagar', $encomenda->id) }}" class="text-warning underline hover:text-yellow-700">Pendente (Pagar)</a>
+                                @else
+                                    {{ ucfirst($encomenda->status) }}
+                                @endif
+                            </td>
                             <td class="font-medium text-success whitespace-nowrap">€{{ number_format($encomenda->total, 2, ',', '.') }}</td>
-                            <!-- <td>
-                                <ul class="list-disc ml-4">
-                                    @foreach($encomenda->itens as $item)
-                                        <li>{{ $item->livro->titulo ?? 'Livro removido' }} ({{ $item->quantidade }})</li>
-                                    @endforeach
-                                </ul>
-                            </td> -->
                         </tr>
                         @empty
                         <tr>

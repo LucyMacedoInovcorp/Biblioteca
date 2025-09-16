@@ -52,7 +52,7 @@
             <input type="text" name="pais" id="pais" class="input input-bordered w-full" required>
         </div>
         <!-- Adicione outros campos se necessário -->
-        <button type="submit" class="btn btn-success w-full">Finalizar Pedido</button>
+        <button type="submit" class="btn btn-success w-full">Efetuar pagamento</button>
     </form>
 </div>
 
