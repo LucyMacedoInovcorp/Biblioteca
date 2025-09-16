@@ -66,6 +66,8 @@
         @auth
         <li><a href="{{ route('requisicoes.index') }}">✅ Requisições</a></li>
         <li><a href="{{ route('profile.show') }}">👤 Perfil</a></li>
+        <li><a href="{{ route('carrinho.listar') }}">🛒 Carrinho</a></li>
+        <li><a href="{{ route('encomendas.meus') }}">📦 Meus Pedidos</a></li>
         @if (auth()->user()->is_admin)
         <li><a href="{{ route('admin.dashboard') }}">⚙️ Administrador</a></li>
         @endif

@@ -6,13 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Encomenda extends Model
 {
+    public function itens()
+    {
+        return $this->hasMany(ItemEncomenda::class);
+    }
     protected $table = 'encomendas';
+
     protected $fillable = [
-        'user_id',
         'carrinho_id',
-        'total',
-        'morada_entrega',
+        'user_id',
         'status',
+        'total',
+        'logradouro',
+        'numero',
+        'porta',
+        'localidade',
+        'codigo_postal',
+        'concelho',
+        'pais',
     ];
 
     public function user()

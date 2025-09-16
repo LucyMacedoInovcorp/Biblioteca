@@ -10,6 +10,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Encomenda;
+
 
 /**
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Requisicao[] $requisicoes
@@ -89,7 +91,14 @@ class User extends Authenticatable
 
 
     /*---------------------CARRINHO-------------------------------*/
-    public function carrinho() {
-    return $this->hasOne(Carrinho::class);
-}
+    public function carrinho()
+    {
+        return $this->hasOne(Carrinho::class);
+    }
+
+
+    public function encomendas()
+    {
+        return $this->hasMany(Encomenda::class);
+    }
 }

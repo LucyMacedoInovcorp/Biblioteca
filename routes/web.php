@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,8 @@ use App\Http\Controllers\AvaliacaoController;
 use App\Http\Controllers\ReviewController;
 //CARRINHO
 use App\Http\Controllers\CarrinhoController;
+//CHECKOUT
+use App\Http\Controllers\CheckoutController;
 
 
 Route::get('/', function () {
@@ -150,3 +153,21 @@ Route::get('/carrinho', [CarrinhoController::class, 'listar'])->name('carrinho.l
 Route::delete('/carrinho/remover/{item}', [CarrinhoController::class, 'remover'])->name('carrinho.remover');
 //Atualizar quantidade do item no carrinho
 Route::put('/carrinho/atualizar/{item}', [CarrinhoController::class, 'atualizar'])->name('carrinho.atualizar');
+
+/* --------------------CHECKOUT--------------------*/
+//Exibir a página de checkout
+Route::get('/checkout', [CheckoutController::class, 'form'])->name('checkout');
+//Processar o checkout - Formulário
+Route::post('/checkout', [CheckoutController::class, 'finalizar'])->name('checkout.finalizar');
+
+
+
+/*--------------------PEDIDOS--------------------*/
+//Página de pedidos para admin
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/pedidos', [App\Http\Controllers\EncomendaController::class, 'todosPedidos'])->name('encomendas.todos');
+});
+// Página de pedidos do usuário autenticado
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/meus-pedidos', [App\Http\Controllers\EncomendaController::class, 'meusPedidos'])->name('encomendas.meus');
+});

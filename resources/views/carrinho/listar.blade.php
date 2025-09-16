@@ -43,7 +43,7 @@
         </span>
     </div>
     <div class="mt-6 text-center">
-        <a href="#" class="btn btn-success btn-lg shadow-lg hover:scale-105">Finalizar Compra</a>
+        <a href="{{ route('checkout') }}" class="btn btn-success btn-lg shadow-lg hover:scale-105">Finalizar Compra</a>
     </div>
     @else
     <div class="text-center text-gray-500 mt-12">

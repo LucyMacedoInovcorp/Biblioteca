@@ -31,6 +31,15 @@
                         <p class="text-gray-200 text-sm">Acesse e aprove ou recuse avaliações de livros enviadas pelos cidadãos.</p>
                     </div>
                 </a>
+
+                <!-- Card: Todos os Pedidos -->
+                <a href="{{ route('admin.encomendas.todos') }}" class="card bg-base-100 shadow-xl image-full hover:shadow-2xl transition-shadow duration-300">
+                    <figure><img src="https://placehold.co/600x400/10B981/ffffff?text=Pedidos" alt="Todos os Pedidos" /></figure>
+                    <div class="card-body justify-end">
+                        <h2 class="card-title text-white">📦 Todos os Pedidos</h2>
+                        <p class="text-gray-200 text-sm">Visualize e gerencie todos os pedidos realizados na biblioteca.</p>
+                    </div>
+                </a>
             </div>
         </div>
         @endif
