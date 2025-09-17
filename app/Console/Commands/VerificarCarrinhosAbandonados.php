@@ -28,12 +28,19 @@ class VerificarCarrinhosAbandonados extends Command
      */
     public function handle()
     {
+        \Log::info('Comando verificar-carrinhos-abandonados foi chamado pelo scheduler.');
         $limite = Carbon::now()->subMinute();
-        // Buscar carrinhos com itens, criados há mais de 1 minuto, sem encomenda associada
-        $carrinhos = Carrinho::whereHas('itens')
+        // Buscar carrinhos com itens, cujo último item foi adicionado há mais de 1 minuto, sem encomenda associada
+        $carrinhos = Carrinho::whereHas('itens', function($q) use ($limite) {
+                $q->where('created_at', '<', $limite);
+            })
             ->whereDoesntHave('encomenda')
-            ->where('created_at', '<', $limite)
             ->get();
+
+        if ($carrinhos->isEmpty()) {
+            $this->info('Nenhum carrinho abandonado encontrado para notificar.');
+            return;
+        }
 
         foreach ($carrinhos as $carrinho) {
             // Aqui será enviado o e-mail posteriormente

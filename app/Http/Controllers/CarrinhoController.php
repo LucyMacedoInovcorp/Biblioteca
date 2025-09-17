@@ -21,11 +21,12 @@ class CarrinhoController extends Controller
             $item->quantidade += 1;
             $item->save();
         } else {
-            $carrinho->itens()->create([
+            $novoItem = $carrinho->itens()->create([
                 'livro_id' => $livro->id,
                 'quantidade' => 1,
                 'preco_unitario' => $livro->preco
             ]);
+            
         }
 
         return redirect()->route('carrinho.listar')->with('success', 'Livro adicionado ao carrinho!');
