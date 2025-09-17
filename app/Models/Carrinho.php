@@ -21,5 +21,9 @@ class Carrinho extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function encomenda()
+    {
+        return $this->hasOne(Encomenda::class);
+    }
 
 }
