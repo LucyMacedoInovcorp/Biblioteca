@@ -26,4 +26,14 @@ class Carrinho extends Model
         return $this->hasOne(Encomenda::class);
     }
 
+
+    /**
+     * Verifica se o carrinho está abandonado.
+     * Ajuste a lógica conforme sua regra de negócio.
+     */
+    public function isAbandonado()
+    {
+        // Exemplo: considera abandonado se não houver encomenda associada
+        return $this->encomenda === null;
+    }
 }

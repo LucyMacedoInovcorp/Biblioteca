@@ -26,8 +26,12 @@ class CarrinhoController extends Controller
                 'quantidade' => 1,
                 'preco_unitario' => $livro->preco
             ]);
-            
         }
+
+        // Dispara o job para enviar e-mail de carrinho abandonado após 1 hora
+        //\App\Jobs\EnviarCarrinhoAbandonadoJob::dispatch($carrinho)->delay(now()->addHour());
+
+        \App\Jobs\EnviarCarrinhoAbandonadoJob::dispatch($carrinho)->delay(now()->addMinute());
 
         return redirect()->route('carrinho.listar')->with('success', 'Livro adicionado ao carrinho!');
     }

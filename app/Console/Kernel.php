@@ -25,9 +25,6 @@ class Kernel extends ConsoleKernel
     $schedule->command('requisicoes:enviar-reminders')->dailyAt('08:00');
     $schedule->command('app:verificar-carrinhos-abandonados')->hourly();
 
-        $schedule->call(function () {
-            info('Tarefa agendada executada com sucesso!');
-        })->everyMinute();
     }
 
     /**
