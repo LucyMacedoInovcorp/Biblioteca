@@ -9,18 +9,27 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+
 class CarrinhoAbandonadoMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $user;
+    public $livro;
+    public $imagemPath;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($user)
+    public function __construct($user, $carrinho)
     {
         $this->user = $user;
+        // Carrega os itens com o relacionamento 'livro'
+        $item = $carrinho->itens()->with('livro')->latest()->first();
+        $this->livro = $item ? $item->livro : null;
+        $this->imagemPath = $this->livro && $this->livro->capa
+        ? asset('storage/capas/' . $this->livro->capa)
+        : null;
     }
 
     /**
@@ -42,6 +51,8 @@ class CarrinhoAbandonadoMail extends Mailable
             view: 'emails.carrinho_abandonado',
             with: [
                 'user' => $this->user,
+                'livro' => $this->livro,
+                'imagemPath' => $this->imagemPath,
             ],
         );
     }
