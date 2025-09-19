@@ -22,8 +22,12 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('requisicoes:enviar-reminders')->dailyAt('08:00');
-        $schedule->command('app:verificar-carrinhos-abandonados')->everyMinute();
+    $schedule->command('requisicoes:enviar-reminders')->dailyAt('08:00');
+    $schedule->command('app:verificar-carrinhos-abandonados')->hourly();
+
+        $schedule->call(function () {
+            info('Tarefa agendada executada com sucesso!');
+        })->everyMinute();
     }
 
     /**
@@ -31,6 +35,6 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
     }
 }
