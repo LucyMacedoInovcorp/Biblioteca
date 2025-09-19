@@ -38,7 +38,7 @@ class CarrinhoController extends Controller
 
             // Dispara o job SOMENTE quando um novo item é criado
             \App\Jobs\EnviarCarrinhoAbandonadoJob::dispatch($carrinho)
-                ->delay(now()->addMinute());
+                ->delay(now()->addHour());
         }
 
         return redirect()
