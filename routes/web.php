@@ -15,6 +15,8 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CarrinhoController;
 //CHECKOUT
 use App\Http\Controllers\CheckoutController;
+//LOGS
+use App\Http\Controllers\LogController;
 
 
 Route::get('/', function () {
@@ -165,6 +167,8 @@ Route::post('/checkout', [CheckoutController::class, 'finalizar'])->name('checko
 //Página de pedidos para admin
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/pedidos', [App\Http\Controllers\EncomendaController::class, 'todosPedidos'])->name('encomendas.todos');
+
+
 });
 // Página de pedidos do usuário autenticado
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -177,3 +181,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkout/success', [App\Http\Controllers\CheckoutStripeController::class, 'success'])->name('checkout.success');
     Route::get('/checkout/cancel', [App\Http\Controllers\CheckoutStripeController::class, 'cancel'])->name('checkout.cancel');
 });
+
+
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/admin/logs', [LogController::class, 'index'])->name('admin.logs.index');
+});
+

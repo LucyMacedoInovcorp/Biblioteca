@@ -9,6 +9,7 @@ use App\Models\Editora;
 use Illuminate\Support\Facades\Http;
 use App\Models\WishlistBook;
 use Illuminate\Support\Facades\Auth;
+use App\Services\LogService;
 
 
 class BibliController extends Controller
@@ -67,6 +68,8 @@ class BibliController extends Controller
         if ($request->filled('autores')) {
             $livro->autores()->sync($request->autores);
         }
+        //LOG DE CRIAÇÃO
+        LogService::log('livros', $livro->id, 'criação', null, $livro->toArray());
 
         return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
     }
@@ -80,6 +83,7 @@ class BibliController extends Controller
         return view('livros.edit', compact('livro', 'editoras', 'autores'));
     }
 
+    //Lógica anterior de updateLivro (sem logs)
     public function updateLivro(Request $request, $id)
     {
         $livro = Livro::findOrFail($id);
@@ -101,12 +105,23 @@ class BibliController extends Controller
             $livro->autores()->sync($request->autores);
         }
 
+
+        //LOG DE EDIÇÃO
+        $dadosAnteriores = $livro->getOriginal();
+        LogService::log('livros', $livro->id, 'atualização', $dadosAnteriores, $livro->toArray());
         return redirect('/livros/create')->with('success', 'Livro atualizado com sucesso!');
     }
+   
+
+
 
     public function destroyLivro($id)
     {
         Livro::findOrFail($id)->delete();
+
+        //LOG DE EXCLUSÃO
+        $dadosLivro = Livro::withTrashed()->find($id)->toArray();
+        LogService::log('livros', $id, 'exclusão', $dadosLivro, null);
         return redirect('/livros/create')->with('msg', 'Livro excluído com sucesso!');
     }
 
@@ -144,6 +159,8 @@ class BibliController extends Controller
 
         $autor->save();
 
+        //LOG DE CRIAÇÃO
+        LogService::log('autores', $autor->id, 'criação', null, $autor->toArray());
         return redirect('/autores/create')->with('msg', 'Novo autor adicionado com sucesso!');
     }
 
@@ -165,12 +182,18 @@ class BibliController extends Controller
 
         $autor->save();
 
+        //LOG DE EDIÇÃO
+        $dadosAnteriores = $autor->getOriginal();
+        LogService::log('autores', $autor->id, 'atualização', $dadosAnteriores, $autor->toArray());
         return redirect('/autores/create')->with('success', 'Autor atualizado com sucesso!');
     }
 
     public function destroyAutor($id)
     {
         Autor::findOrFail($id)->delete();
+        //LOG DE EXCLUSÃO
+        $dadosAutor = Autor::withTrashed()->find($id)->toArray();
+        LogService::log('autores', $id, 'exclusão', $dadosAutor, null);
         return redirect('/autores/create')->with('msg', 'Autor excluído com sucesso!');
     }
 
@@ -198,6 +221,8 @@ class BibliController extends Controller
 
         $editora->save();
 
+        //LOG DE CRIAÇÃO
+        LogService::log('editoras', $editora->id, 'criação', null, $editora->toArray());
         return redirect('/editoras/create')->with('msg', 'Nova editora adicionada com sucesso!');
     }
 
@@ -219,12 +244,17 @@ class BibliController extends Controller
 
         $editora->save();
 
-        return redirect('/editoras/create')->with('success', 'Editora atualizada com sucesso!');
+        //LOG DE EDIÇÃO
+        $dadosAnteriores = $editora->getOriginal();
+        LogService::log('editoras', $editora->id, 'atualização', $dadosAnteriores, $editora->toArray());        return redirect('/editoras/create')->with('success', 'Editora atualizada com sucesso!');
     }
 
     public function destroyEditora($id)
     {
         Editora::findOrFail($id)->delete();
+        //LOG DE EXCLUSÃO
+        $dadosEditora = Editora::withTrashed()->find($id)->toArray();
+        LogService::log('editoras', $id, 'exclusão', $dadosEditora, null);
         return redirect('/editoras/create')->with('msg', 'Editora excluída com sucesso!');
     }
 
@@ -286,6 +316,9 @@ class BibliController extends Controller
 
         $livro->autores()->sync($autores->pluck('id'));
 
+        //LOG DE CRIAÇÃO
+        LogService::log('livros', $livro->id, 'criação', null, $livro->toArray());  
+        
         return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
     }
 }
