@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Livro extends Model
 {
+    use HasFactory;
+    
     protected $table = 'livros';
     protected $fillable = [
         'nome',
@@ -19,7 +22,7 @@ class Livro extends Model
         'stripe_price_id',
     ];
 
-
+    
     /**
      * Um Livro pertence a uma Editora
      */

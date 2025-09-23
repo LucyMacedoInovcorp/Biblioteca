@@ -2,31 +2,50 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Requisicao;
 use App\Models\User;
 use App\Models\Livro;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-
-
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Requisicao>
- */
 class RequisicaoFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Requisicao::class;
+
+    public function definition()
     {
         return [
-            'user_id' => User::factory(),   // gera um utilizador fake
-            'livro_id' => Livro::factory(), // gera um livro fake
-            'ativo' => $this->faker->boolean(),
-            'data_recepcao' => $this->faker->dateTimeBetween('now', '+10 days'),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'user_id' => User::factory(),
+            'livro_id' => Livro::factory(),
+            'ativo' => true,
+            'data_recepcao' => null,
+            'dias_decorridos' => null,
         ];
+    }
+
+    /**
+     * Requisição ativa
+     */
+    public function ativa()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'ativo' => true,
+                'data_recepcao' => null,
+            ];
+        });
+    }
+
+    /**
+     * Requisição devolvida
+     */
+    public function devolvida()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'ativo' => false,
+                'data_recepcao' => $this->faker->dateTimeBetween('-30 days', 'now'),
+                'dias_decorridos' => $this->faker->numberBetween(1, 30),
+            ];
+        });
     }
 }
