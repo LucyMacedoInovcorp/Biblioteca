@@ -5,10 +5,10 @@
 
 
 @if(session('success') || session('msg'))
-  <div class="mb-4" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; 
+<div class="mb-4" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; 
   padding: 0.75rem 1rem; border-radius: 0.375rem;">
-    {{ session('success') ?? session('msg') }}
-  </div>
+  {{ session('success') ?? session('msg') }}
+</div>
 @endif
 
 
@@ -22,72 +22,82 @@
       @csrf
       <!-- Capa -->
       <div class="form-control">
-      <label for="imagemcapa" class="label">
-        <span class="label-text font-semibold">Imagem do Livro</span>
-      </label>
-      <input type="file" id="imagemcapa" name="imagemcapa" class="file-input file-input-bordered w-full" />
+        <label for="imagemcapa" class="label">
+          <span class="label-text font-semibold">Imagem do Livro</span>
+        </label>
+        <input type="file" id="imagemcapa" name="imagemcapa" class="file-input file-input-bordered w-full" />
       </div>
       <!-- Nome -->
       <div class="form-control">
-      <label for="nome" class="label">
-        <span class="label-text font-semibold">Nome do Livro</span>
-      </label>
-      <input type="text" id="nome" name="nome" placeholder="Digite o nome do livro"
-        class="input input-bordered w-full" />
+        <label for="nome" class="label">
+          <span class="label-text font-semibold">Nome do Livro</span>
+        </label>
+        <input type="text" id="nome" name="nome" placeholder="Digite o nome do livro"
+          class="input input-bordered w-full" />
       </div>
       <!-- ISBN -->
       <div class="form-control">
-      <label for="ISBN" class="label">
-        <span class="label-text font-semibold">ISBN</span>
-      </label>
-      <input type="text" id="ISBN" name="ISBN" placeholder="Digite o ISBN"
-        class="input input-bordered w-full" />
+        <label for="ISBN" class="label">
+          <span class="label-text font-semibold">ISBN</span>
+        </label>
+        <input type="text" id="ISBN" name="ISBN" placeholder="Digite o ISBN"
+          class="input input-bordered w-full" />
       </div>
       <!-- Bibliografia -->
       <div class="form-control">
-      <label for="bibliografia" class="label">
-        <span class="label-text font-semibold">Bibliografia</span>
-      </label>
-      <textarea id="bibliografia" name="bibliografia" placeholder="Escreva a bibliografia"
-        class="textarea textarea-bordered w-full"></textarea>
+        <label for="bibliografia" class="label">
+          <span class="label-text font-semibold">Bibliografia</span>
+        </label>
+        <textarea id="bibliografia" name="bibliografia" placeholder="Escreva a bibliografia"
+          class="textarea textarea-bordered w-full"></textarea>
       </div>
+
+      <!-- Estoque -->
+      <div class="form-control">
+        <label for="estoque" class="label">
+          <span class="label-text font-semibold">Estoque</span>
+        </label>
+        <input type="number" id="estoque" name="estoque" placeholder="Quantidade em estoque"
+          class="input input-bordered w-full" />
+      </div>
+      
       <!-- Preço -->
       <div class="form-control">
-      <label for="preco" class="label">
-        <span class="label-text font-semibold">Preço</span>
-      </label>
-      <input type="number" step="0.01" id="preco" name="preco" placeholder="Preço do livro (€)"
-        class="input input-bordered w-full" />
+        <label for="preco" class="label">
+          <span class="label-text font-semibold">Preço</span>
+        </label>
+        <input type="number" step="0.01" id="preco" name="preco" placeholder="Preço do livro (€)"
+          class="input input-bordered w-full" />
       </div>
       <!-- Editora -->
       <div class="form-control">
-      <label for="editoras" class="label">
-        <span class="label-text font-semibold">Editoras</span>
-      </label>
-      <select id="editoras" name="editoras[]" multiple placeholder="Selecione a editora...">
+        <label for="editoras" class="label">
+          <span class="label-text font-semibold">Editoras</span>
+        </label>
+        <select id="editoras" name="editoras[]" multiple placeholder="Selecione a editora...">
 
-        @foreach($editoras as $editora)
-        <option value="{{ $editora->id }}">{{ $editora->nome }}</option>
-        @endforeach
-      </select>
+          @foreach($editoras as $editora)
+          <option value="{{ $editora->id }}">{{ $editora->nome }}</option>
+          @endforeach
+        </select>
       </div>
       <!-- Autores -->
       <div class="form-control">
-      <label for="autores" class="label">
-        <span class="label-text font-semibold">Autores</span>
-      </label>
-      <select id="autores" name="autores[]" multiple placeholder="Selecione autores...">
-        @foreach($autores as $autor)
-        <option value="{{ $autor->id }}">{{ $autor->nome }}</option>
-        @endforeach
-      </select>
+        <label for="autores" class="label">
+          <span class="label-text font-semibold">Autores</span>
+        </label>
+        <select id="autores" name="autores[]" multiple placeholder="Selecione autores...">
+          @foreach($autores as $autor)
+          <option value="{{ $autor->id }}">{{ $autor->nome }}</option>
+          @endforeach
+        </select>
       </div>
       <!-- Imagem padrão -->
       <input type="hidden" name="imagem_padrao" value="default-book.png">
 
       <!-- Botão -->
       <div class="form-control mt-20">
-      <button type="submit" class="btn btn-primary w-full">➕ Incluir livro</button>
+        <button type="submit" class="btn btn-primary w-full">➕ Incluir livro</button>
       </div>
     </form>
 
@@ -138,6 +148,7 @@
               <th scope="col">🏢 Editora</th>
               <th scope="col">👤 Autores</th>
               <th scope="col">📥 Requisição</th>
+              <th scope="col" class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">📦 Estoque</th>
               <th scope="col" class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif">⚙️ Ações</th>
             </tr>
           </thead>
@@ -174,51 +185,58 @@
 
               <td>
                 @if($livro->requisicoes()->where('ativo', true)->exists())
-                  @php
-                    $requisicaoAtiva = $livro->requisicoes()->where('ativo', true)->first();
-                    $notificacaoAtiva = false;
-                    $isDonoRequisicao = auth()->check() && $requisicaoAtiva && $requisicaoAtiva->user_id === auth()->id();
-                    if(auth()->check()) {
-                      $notificacaoAtiva = $livro->notificacoesDisponibilidade()->where('user_id', auth()->id())->exists();
-                    }
-                  @endphp
+                @php
+                $requisicaoAtiva = $livro->requisicoes()->where('ativo', true)->first();
+                $notificacaoAtiva = false;
+                $isDonoRequisicao = auth()->check() && $requisicaoAtiva && $requisicaoAtiva->user_id === auth()->id();
+                if(auth()->check()) {
+                $notificacaoAtiva = $livro->notificacoesDisponibilidade()->where('user_id', auth()->id())->exists();
+                }
+                @endphp
 
-                  @if($isDonoRequisicao)
-                    <button class="btn btn-sm btn-warning opacity-60 cursor-not-allowed" disabled>Em curso</button>
-                  @else
-                    @if($notificacaoAtiva)
-                      <button class="btn btn-sm btn-warning opacity-60 cursor-not-allowed" disabled>Notificação em espera</button>
-                    @else
-                      <form action="{{ route('livros.notificar-disponibilidade', $livro->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-warning">
-                          Notificar disponibilidade
-                        </button>
-                      </form>
-                    @endif
-                  @endif
+                @if($isDonoRequisicao)
+                <button class="btn btn-sm btn-warning opacity-60 cursor-not-allowed" disabled>Em curso</button>
                 @else
-                  @guest
-                  <!-- Visitante: livro disponível mas precisa logar -->
-                  <a href="{{ route('login') }}" class="btn btn-sm btn-outline">
-                    🔑 Requisitar
-                  </a>
+                @if($notificacaoAtiva)
+                <button class="btn btn-sm btn-warning opacity-60 cursor-not-allowed" disabled>Notificação em espera</button>
+                @else
+                <form action="{{ route('livros.notificar-disponibilidade', $livro->id) }}" method="POST">
+                  @csrf
+                  <button type="submit" class="btn btn-sm btn-warning">
+                    Notificar disponibilidade
+                  </button>
+                </form>
+                @endif
+                @endif
+                @else
+                @guest
+                <!-- Visitante: livro disponível mas precisa logar -->
+                <a href="{{ route('login') }}" class="btn btn-sm btn-outline">
+                  🔑 Requisitar
+                </a>
+                @else
+                <!-- Usuário logado -->
+                @if(auth()->user()->requisicoes()->where('ativo', true)->count() < 3)
+                  <form action="{{ route('livros.requisitar', $livro->id) }}" method="POST">
+                  @csrf
+                  <button type="submit" class="btn btn-sm btn-success">
+                    📥 Requisitar
+                  </button>
+                  </form>
                   @else
-                  <!-- Usuário logado -->
-                  @if(auth()->user()->requisicoes()->where('ativo', true)->count() < 3)
-                    <form action="{{ route('livros.requisitar', $livro->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-success">
-                      📥 Requisitar
-                    </button>
-                    </form>
-                  @else
-                    <span class="badge badge-error whitespace-nowrap">Limite atingido</span>
+                  <span class="badge badge-error whitespace-nowrap">Limite atingido</span>
                   @endif
                   @endguest
-                @endif
+                  @endif
               </td>
 
+              <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <span class="font-semibold {{ $livro->estoque > 0 ? 'text-success' : 'text-error' }}">
+                    {{ $livro->estoque ?? 0 }}
+                  </span>
+                </div>
+              </td>
 
 
               <td class="@if(!auth()->check() || !auth()->user()->is_admin) hidden @endif flex items-center gap-3">

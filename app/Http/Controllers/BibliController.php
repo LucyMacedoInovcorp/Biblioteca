@@ -45,6 +45,7 @@ class BibliController extends Controller
             'ISBN' => 'nullable|string|max:255',
             'bibliografia' => 'nullable|string',
             'preco' => 'required|numeric',
+            'estoque' => 'required|integer|min:0',
             'editoras' => 'required|array|min:1',
             'autores' => 'required|array|min:1',
         ]);
@@ -54,6 +55,7 @@ class BibliController extends Controller
         $livro->ISBN         = $request->ISBN;
         $livro->bibliografia = $request->bibliografia;
         $livro->preco        = $request->preco;
+        $livro->estoque      = $request->estoque; 
         $livro->editora_id   = $request->editoras[0];
 
         if ($request->hasFile('imagemcapa')) {
@@ -74,6 +76,7 @@ class BibliController extends Controller
             'nome' => $livro->nome,
             'ISBN' => $livro->ISBN,
             'preco' => $livro->preco,
+            'estoque' => $livro->estoque, 
         ];
         LogService::log('livros', $livro->id, 'criação', null, $dadosNovos);
 
@@ -91,6 +94,17 @@ class BibliController extends Controller
 
     public function updateLivro(Request $request, $id)
     {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'ISBN' => 'nullable|string|max:255',
+            'bibliografia' => 'nullable|string',
+            'preco' => 'required|numeric|min:0',
+            'estoque' => 'required|integer|min:0', 
+            'editora_id' => 'required|exists:editoras,id',
+            'autores' => 'required|array',
+            'imagemcapa' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         $livro = Livro::findOrFail($id);
 
         // CAPTURAR DADOS ANTES DA ALTERAÇÃO (incluindo imagem)
@@ -99,8 +113,9 @@ class BibliController extends Controller
             'ISBN' => $livro->ISBN,
             'bibliografia' => $livro->bibliografia,
             'preco' => $livro->preco,
+            'estoque' => $livro->estoque, 
             'editora_id' => $livro->editora_id,
-            'imagemcapa' => $livro->imagemcapa, // ADICIONADO
+            'imagemcapa' => $livro->imagemcapa,
         ];
 
         // FAZER AS ALTERAÇÕES
@@ -108,6 +123,7 @@ class BibliController extends Controller
         $livro->ISBN         = $request->ISBN;
         $livro->bibliografia = $request->bibliografia;
         $livro->preco        = $request->preco;
+        $livro->estoque      = $request->estoque; 
         $livro->editora_id   = $request->editora_id;
 
         // CONTROLAR SE HOUVE ALTERAÇÃO DE IMAGEM
@@ -130,8 +146,9 @@ class BibliController extends Controller
             'ISBN' => $livro->ISBN,
             'bibliografia' => $livro->bibliografia,
             'preco' => $livro->preco,
+            'estoque' => $livro->estoque, 
             'editora_id' => $livro->editora_id,
-            'imagemcapa' => $livro->imagemcapa, // ADICIONADO
+            'imagemcapa' => $livro->imagemcapa,
         ];
 
         // ADICIONAR FLAG DE IMAGEM SE HOUVE ALTERAÇÃO
@@ -155,6 +172,7 @@ class BibliController extends Controller
             'nome' => $livro->nome,
             'ISBN' => $livro->ISBN,
             'preco' => $livro->preco,
+            'estoque' => $livro->estoque, 
         ];
 
         $livro->delete();
@@ -229,7 +247,7 @@ class BibliController extends Controller
         // CAPTURAR DADOS ANTES (incluindo foto)
         $dadosAnteriores = [
             'nome' => $autor->nome,
-            'foto' => $autor->foto, // ADICIONADO
+            'foto' => $autor->foto,
         ];
 
         // FAZER A ALTERAÇÃO
@@ -248,7 +266,7 @@ class BibliController extends Controller
         // CAPTURAR DADOS DEPOIS
         $dadosNovos = [
             'nome' => $autor->nome,
-            'foto' => $autor->foto, // ADICIONADO
+            'foto' => $autor->foto,
         ];
 
         // ADICIONAR FLAG DE IMAGEM SE HOUVE ALTERAÇÃO
@@ -262,7 +280,6 @@ class BibliController extends Controller
 
         return redirect('/autores/create')->with('success', 'Autor actualizado com sucesso!');
     }
-
 
     public function destroyAutor($id)
     {
@@ -334,7 +351,7 @@ class BibliController extends Controller
         // CAPTURAR DADOS ANTES (incluindo logótipo)
         $dadosAnteriores = [
             'nome' => $editora->nome,
-            'logotipo' => $editora->logotipo, // ADICIONADO
+            'logotipo' => $editora->logotipo,
         ];
 
         // FAZER A ALTERAÇÃO
@@ -353,7 +370,7 @@ class BibliController extends Controller
         // CAPTURAR DADOS DEPOIS
         $dadosNovos = [
             'nome' => $editora->nome,
-            'logotipo' => $editora->logotipo, // ADICIONADO
+            'logotipo' => $editora->logotipo,
         ];
 
         // ADICIONAR FLAG DE IMAGEM SE HOUVE ALTERAÇÃO
@@ -426,6 +443,7 @@ class BibliController extends Controller
             'ISBN' => $validatedData['isbn'],
             'bibliografia' => $validatedData['description'],
             'preco' => 0,
+            'estoque' => 0, 
             'editora_id' => $editora->id,
             'imagemcapa' => $imagemCapa,
         ]);
@@ -437,6 +455,7 @@ class BibliController extends Controller
             'nome' => $livro->nome,
             'ISBN' => $livro->ISBN,
             'preco' => $livro->preco,
+            'estoque' => $livro->estoque, 
             'fonte' => 'API Google Books'
         ];
         LogService::log('livros', $livro->id, 'criação', null, $dadosNovos);
@@ -509,8 +528,7 @@ class BibliController extends Controller
 
         LogService::simples('sistema', 0, "Exportação de livros → Formato: {$formato} | Utilizador: " . Auth::user()->name);
 
-        // Aqui iria a lógica de exportação (Excel, CSV, PDF, etc.)
-        // Por agora, retorna uma resposta simples
+
 
         return response()->json([
             'success' => true,
@@ -530,8 +548,6 @@ class BibliController extends Controller
 
         LogService::simples('sistema', 0, "Importação de livros → Arquivo: {$arquivo->getClientOriginalName()} | Formato: {$extensao}");
 
-        // Aqui iria a lógica de importação
-        // Por agora, simula sucesso
 
         return redirect()->back()->with('success', '✅ Arquivo importado com sucesso! Os livros serão processados em segundo plano.');
     }
