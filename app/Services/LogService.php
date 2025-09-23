@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\Log;
 use Illuminate\Support\Facades\Auth;
 
+
+
+/*------------------------INCLUSÃO, ALTERAÇÃO E EXCLUSÃO DE REGISTOS------------------------*/
 class LogService
 {
     public static function log($modulo, $objetoId, $acao, $dadosAnteriores = null, $dadosNovos = null)
@@ -394,4 +397,7 @@ class LogService
                 ->get()
         ];
     }
+
+
+    /*------------------------REQUISIÇÃO E DEVOLUÇÃO DE LIVROS------------------------*/
 }
