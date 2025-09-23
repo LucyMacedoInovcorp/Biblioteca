@@ -10,25 +10,25 @@ uses(RefreshDatabase::class);
 describe('RequisicaoController', function () {
 
 
-    
-    it('pode criar uma requisição de livro com sucesso', function () {
+    /*-----------------1. Teste de Criação de Requisição de Livro-----------------*/    
+    it('1. Teste de Criação de Requisição de Livro', function () {
         Mail::fake();
 
-        // Criar utilizador e livro na base de dados
+        // 1.1 ---> Criar um utilizador e um livro na base de dados.
         $user = User::factory()->create();
         $livro = Livro::factory()->create(['disponivel' => true]);
 
         // Simular autenticação do utilizador
         $this->actingAs($user);
 
-        // Simular a submissão de uma requisição (rota correta)
+        // 1.2 ---> Simular a submissão de uma requisição.
         $response = $this->post("/livros/{$livro->id}/requisitar");
 
         // Verificar que foi redirecionado com sucesso
         $response->assertRedirect('/livros/create');
         $response->assertSessionHas('success', '✅ Requisição realizada com sucesso! Um e-mail de confirmação foi enviado.');
 
-        // Garantir que a requisição foi criada (usando 1 para MySQL boolean)
+        // 1.3 ---> Garantir que a requisição foi criada e que os dados estão corretos.
         $this->assertDatabaseHas('requisicoes', [
             'user_id' => $user->id,
             'livro_id' => $livro->id,
@@ -49,9 +49,142 @@ describe('RequisicaoController', function () {
         expect($requisicao->livro_id)->toBe($livro->id);
     });
 
+        /*-----------------2. Teste de Validação de Requisição-----------------*/
+    it('2. Teste de Validação de Requisição', function () {
+
+        // 2.1 ---> Simular uma requisição sem um livro válido.
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // Tentar criar requisição com ID de livro inexistente
+        $response = $this->post('/livros/999/requisitar');
+
+        // 2.2 ---> Verificar se o Laravel retorna erro de validação adequado.
+        $response->assertStatus(404);
+
+        // Verificar que nenhuma requisição foi criada
+        $this->assertDatabaseCount('requisicoes', 0);
+    });
+
+        /*-----------------3. Teste de Devolução de Livro-----------------*/  
+    it('3. Teste de Devolução de Livro', function () {
+        $user = User::factory()->create();
+        $livro = Livro::factory()->create(['disponivel' => false]);
+
+        // 3.1 ---> Criar uma requisição ativa na base de dados.
+        $requisicao = Requisicao::factory()->create([
+            'user_id' => $user->id,
+            'livro_id' => $livro->id,
+            'ativo' => 1, 
+            'data_recepcao' => null,
+            'dias_decorridos' => null,
+            'created_at' => now()->subDays(10), // Criada há 10 dias
+        ]);
+
+        $this->actingAs($user);
+
+        // Simular devolução (rota correta)
+        $response = $this->post("/requisicoes/{$requisicao->id}/confirmar");
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', '✅ Devolução confirmada!');
+
+        // 3.3 ---> Verificar se a requisição foi atualizada corretamente.
+        $requisicao->refresh();
+        $livro->refresh();
+
+        expect($requisicao->ativo)->toBe(0); 
+        expect($requisicao->data_recepcao)->not->toBeNull();
+        expect($livro->disponivel)->toBeTrue(); 
+
+        // Verificar na base de dados
+        $this->assertDatabaseHas('requisicoes', [
+            'id' => $requisicao->id,
+            'ativo' => 0, 
+        ]);
+
+        $this->assertDatabaseHas('livros', [
+            'id' => $livro->id,
+            'disponivel' => 1, 
+        ]);
+    });
+
+        /*-----------------3. Teste de Devolução de Livro (Parte 2 - Devolução)-----------------*/
+    it('3. Teste de Devolução de Livro (Parte 2 - Devolução)', function () {
+        $user = User::factory()->create();
+        $livro = Livro::factory()->create(['disponivel' => false]);
+
+        $diasAnteriores = 15;
+
+        // Criar requisição com data específica
+        $requisicao = Requisicao::factory()->create([
+            'user_id' => $user->id,
+            'livro_id' => $livro->id,
+            'ativo' => 1,
+            'created_at' => now()->subDays($diasAnteriores),
+        ]);
+
+        $this->actingAs($user);
+
+        // 3.2 ---> Simular uma requisição para devolver o livro.
+        $this->post("/requisicoes/{$requisicao->id}/confirmar");
+
+        $requisicao->refresh();
+
+        // Verificar que os dias foram calculados corretamente (pode ter 1 dia de diferença devido ao timing)
+        expect($requisicao->dias_decorridos)->toBeGreaterThanOrEqual($diasAnteriores - 1);
+        expect($requisicao->dias_decorridos)->toBeLessThanOrEqual($diasAnteriores + 1);
+    });
+
+        /*-----------------4. Teste de Listagem de Requisições por Utilizador-----------------*/
+    it('4. Teste de Listagem de Requisições por Utilizador', function () {
 
 
-    it('não permite requisição sem autenticação', function () {
+        // 4.1 ---> Criar múltiplas requisições para diferentes utilizadores.
+        // Criar utilizadores
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        // Criar requisições para user1
+        Requisicao::factory()->count(3)->create([
+            'user_id' => $user1->id,
+        ]);
+
+        // Criar requisições para user2
+        Requisicao::factory()->count(2)->create([
+            'user_id' => $user2->id,
+        ]);
+
+        // Testar como utilizador normal - deve ver apenas suas requisições
+        $this->actingAs($user1);
+        $response = $this->get('/requisicoes');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('requisicoes.index');
+
+        // 4.2 ---> Simular um pedido para obter as requisições de um utilizador específico.
+        $requisicoes = $response->viewData('requisicoes');
+        expect($requisicoes)->toHaveCount(3);
+
+        foreach ($requisicoes as $requisicao) {
+            expect($requisicao->user_id)->toBe($user1->id);
+        }
+
+        // Testar como admin - deve ver todas as requisições
+        $this->actingAs($admin);
+        $response = $this->get('/requisicoes');
+
+        $response->assertStatus(200);
+        $requisicoes = $response->viewData('requisicoes');
+
+        // 4.3 ---> Verificar se apenas as requisições corretas são retornadas.
+        expect($requisicoes)->toHaveCount(5);
+    });
+
+        /*-----------------Testes Complementares-----------------*/
+    
+    it('Teste complementar - Não permite requisição sem autenticação', function () {
         $livro = Livro::factory()->create(['disponivel' => true]);
 
         // Tentar fazer requisição sem estar autenticado
@@ -69,7 +202,8 @@ describe('RequisicaoController', function () {
             'disponivel' => 1, // MySQL boolean como 1
         ]);
     });
-    it('não permite mais de 3 requisições ativas por utilizador', function () {
+
+    it('Teste complementar - Não permite mais de 3 requisições ativas por utilizador', function () {
         Mail::fake();
 
         $user = User::factory()->create();
@@ -101,7 +235,8 @@ describe('RequisicaoController', function () {
         // Verificar que ainda tem apenas 3 requisições ativas (usando 1 para MySQL)
         expect($user->requisicoes()->where('ativo', 1)->count())->toBe(3);
     });
-    it('não permite requisitar livro já requisitado por outro utilizador', function () {
+
+    it('Teste complementar - Não permite requisitar livro já requisitado por outro utilizador', function () {
         Mail::fake();
 
         $user1 = User::factory()->create();
@@ -133,136 +268,7 @@ describe('RequisicaoController', function () {
     });
 
 
-
-
-    it('pode devolver um livro corretamente', function () {
-        $user = User::factory()->create();
-        $livro = Livro::factory()->create(['disponivel' => false]);
-
-        // Criar requisição ativa
-        $requisicao = Requisicao::factory()->create([
-            'user_id' => $user->id,
-            'livro_id' => $livro->id,
-            'ativo' => 1, // MySQL boolean como 1
-            'data_recepcao' => null,
-            'dias_decorridos' => null,
-            'created_at' => now()->subDays(10), // Criada há 10 dias
-        ]);
-
-        $this->actingAs($user);
-
-        // Simular devolução (rota correta)
-        $response = $this->post("/requisicoes/{$requisicao->id}/confirmar");
-
-        $response->assertRedirect();
-        $response->assertSessionHas('success', '✅ Devolução confirmada!');
-
-        // Verificar que o estado da requisição foi atualizado
-        $requisicao->refresh();
-        $livro->refresh();
-
-        expect($requisicao->ativo)->toBe(0); // MySQL retorna 0 em vez de false
-        expect($requisicao->data_recepcao)->not->toBeNull();
-        // Usar toBeTrue() em vez de toBe(1) para maior flexibilidade
-        expect($livro->disponivel)->toBeTrue(); // Aceita tanto true quanto 1
-
-        // Verificar na base de dados
-        $this->assertDatabaseHas('requisicoes', [
-            'id' => $requisicao->id,
-            'ativo' => 0, // MySQL boolean como 0
-        ]);
-
-        $this->assertDatabaseHas('livros', [
-            'id' => $livro->id,
-            'disponivel' => 1, // MySQL boolean como 1
-        ]);
-    });
-
-
-
-
-
-
-    it('pode listar requisições por utilizador corretamente', function () {
-        // Criar utilizadores
-        $user1 = User::factory()->create();
-        $user2 = User::factory()->create();
-        $admin = User::factory()->create(['is_admin' => true]);
-
-        // Criar requisições para user1
-        Requisicao::factory()->count(3)->create([
-            'user_id' => $user1->id,
-        ]);
-
-        // Criar requisições para user2
-        Requisicao::factory()->count(2)->create([
-            'user_id' => $user2->id,
-        ]);
-
-        // Testar como utilizador normal - deve ver apenas suas requisições
-        $this->actingAs($user1);
-        $response = $this->get('/requisicoes');
-
-        $response->assertStatus(200);
-        $response->assertViewIs('requisicoes.index');
-
-        // Verificar que o utilizador vê apenas suas requisições
-        $requisicoes = $response->viewData('requisicoes');
-        expect($requisicoes)->toHaveCount(3);
-
-        foreach ($requisicoes as $requisicao) {
-            expect($requisicao->user_id)->toBe($user1->id);
-        }
-
-        // Testar como admin - deve ver todas as requisições
-        $this->actingAs($admin);
-        $response = $this->get('/requisicoes');
-
-        $response->assertStatus(200);
-        $requisicoes = $response->viewData('requisicoes');
-
-        // Admin deve ver todas as 5 requisições
-        expect($requisicoes)->toHaveCount(5);
-    });
-    it('valida que requisição não pode ser criada sem livro válido', function () {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        // Tentar criar requisição com ID de livro inexistente
-        $response = $this->post('/livros/999/requisitar');
-
-        // Deve retornar 404 pois o livro não existe
-        $response->assertStatus(404);
-
-        // Verificar que nenhuma requisição foi criada
-        $this->assertDatabaseCount('requisicoes', 0);
-    });
-    it('calcula dias decorridos corretamente na devolução', function () {
-        $user = User::factory()->create();
-        $livro = Livro::factory()->create(['disponivel' => false]);
-
-        $diasAnteriores = 15;
-
-        // Criar requisição com data específica
-        $requisicao = Requisicao::factory()->create([
-            'user_id' => $user->id,
-            'livro_id' => $livro->id,
-            'ativo' => 1,
-            'created_at' => now()->subDays($diasAnteriores),
-        ]);
-
-        $this->actingAs($user);
-
-        // Fazer devolução
-        $this->post("/requisicoes/{$requisicao->id}/confirmar");
-
-        $requisicao->refresh();
-
-        // Verificar que os dias foram calculados corretamente (pode ter 1 dia de diferença devido ao timing)
-        expect($requisicao->dias_decorridos)->toBeGreaterThanOrEqual($diasAnteriores - 1);
-        expect($requisicao->dias_decorridos)->toBeLessThanOrEqual($diasAnteriores + 1);
-    });
-    it('não permite utilizador exceder limite de 3 requisições ativas', function () {
+    it('Teste complementar - Não permite utilizador exceder limite de 3 requisições ativas', function () {
         Mail::fake();
 
         $user = User::factory()->create();
@@ -292,7 +298,8 @@ describe('RequisicaoController', function () {
         // Verificar que ainda tem apenas 3 requisições
         expect($user->fresh()->requisicoes()->where('ativo', 1)->count())->toBe(3);
     });
-    it('permite requisitar após devolver um livro', function () {
+
+    it('Teste complementar - Permite requisitar após devolver um livro', function () {
         Mail::fake();
 
         $user = User::factory()->create();
