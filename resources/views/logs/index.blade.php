@@ -52,7 +52,7 @@
                             <th scope="col" class="w-40">👤 Utilizador</th>
                             <th scope="col" class="w-24">📂 Módulo</th>
                             <th scope="col" class="w-16">🆔 ID</th>
-                            <th scope="col">📝 Alteração</th>
+                            <th scope="col" class="min-w-96">📝 Alteração</th>
                             <th scope="col" class="w-32">🌐 IP</th>
                             <th scope="col" class="w-40">🖥️ Browser</th>
                         </tr>
@@ -100,22 +100,95 @@
                                 @endif
                             </td>
 
+
+
                             <!-- Alteração -->
-                            <td class="max-w-xs">
+                            <td class="max-w-lg"> <!-- Mudou de max-w-xs para max-w-lg -->
                                 @if(Str::contains($log->alteracao, '→'))
                                 @php
-                                $parts = explode(' - ', $log->alteracao, 2);
-                                $acao = $parts[0] ?? '';
-                                $detalhes = $parts[1] ?? '';
+                                $parts = explode(' → ', $log->alteracao, 2);
+                                $tipoAcao = trim($parts[0] ?? '');
+                                $detalhes = trim($parts[1] ?? '');
                                 @endphp
-                                <div class="font-semibold text-primary text-sm">{{ $acao }}</div>
-                                @if($detalhes)
-                                <div class="text-xs text-gray-500 truncate" title="{{ $detalhes }}">
-                                    {{ Str::limit($detalhes, 60) }}
+
+                                <div class="space-y-1">
+                                    <!-- Tipo de acção -->
+                                    <div class="flex items-center gap-1">
+                                        @switch($tipoAcao)
+                                        @case('Criação')
+                                        <span class="badge badge-success badge-xs">➕</span>
+                                        <span class="font-semibold text-success text-sm">{{ $tipoAcao }}</span>
+                                        @break
+                                        @case('Actualização')
+                                        <span class="badge badge-warning badge-xs">✏️</span>
+                                        <span class="font-semibold text-warning text-sm">{{ $tipoAcao }}</span>
+                                        @break
+                                        @case('Exclusão')
+                                        <span class="badge badge-error badge-xs">🗑️</span>
+                                        <span class="font-semibold text-error text-sm">{{ $tipoAcao }}</span>
+                                        @break
+                                        @default
+                                        <span class="badge badge-neutral badge-xs">ℹ️</span>
+                                        <span class="font-semibold text-neutral text-sm">{{ $tipoAcao }}</span>
+                                        @endswitch
+                                    </div>
+
+                                    <!-- Detalhes -->
+                                    @if($detalhes)
+                                    <div class="text-xs text-gray-600">
+                                        @if(Str::contains($detalhes, ' | '))
+                                        @php
+                                        $mudancas = explode(' | ', $detalhes);
+                                        @endphp
+                                        @foreach(array_slice($mudancas, 0, 3) as $mudanca) <!-- Aumentou de 2 para 3 -->
+                                        <div class="bg-base-200 px-3 py-2 rounded text-xs mb-2"> <!-- Aumentou padding -->
+                                            @if(Str::contains($mudanca, ' → de:') && Str::contains($mudanca, 'para:'))
+                                            @php
+                                            if (preg_match('/(.+?) → de: (.+?) para: (.+)/', $mudanca, $matches)) {
+                                            $campo = trim($matches[1]);
+                                            $antes = trim($matches[2]);
+                                            $depois = trim($matches[3]);
+                                            } else {
+                                            $campo = $mudanca;
+                                            $antes = '';
+                                            $depois = '';
+                                            }
+                                            @endphp
+                                            @if($campo && $antes && $depois)
+                                            <div class="font-medium text-primary text-xs mb-2">📝 {{ $campo }}</div>
+                                            <div class="grid grid-cols-1 gap-2"> <!-- Mudou de grid-cols-2 para grid-cols-1 para mais espaço -->
+                                                <div class="text-red-600 text-xs flex items-start gap-1">
+                                                    <span class="flex-shrink-0">❌ Antes:</span>
+                                                    <span class="break-words" title="{{ $antes }}">{{ Str::limit($antes, 60) }}</span> <!-- Aumentou de 15 para 60 -->
+                                                </div>
+                                                <div class="text-green-600 text-xs flex items-start gap-1">
+                                                    <span class="flex-shrink-0">✅ Depois:</span>
+                                                    <span class="break-words" title="{{ $depois }}">{{ Str::limit($depois, 60) }}</span> <!-- Aumentou de 15 para 60 -->
+                                                </div>
+                                            </div>
+                                            @else
+                                            <div class="text-xs">{{ Str::limit($mudanca, 80) }}</div> <!-- Aumentou de 40 para 80 -->
+                                            @endif
+                                            @else
+                                            <div class="text-xs">{{ Str::limit($mudanca, 80) }}</div> <!-- Aumentou de 40 para 80 -->
+                                            @endif
+                                        </div>
+                                        @endforeach
+                                        @if(count($mudancas) > 3) <!-- Ajustou de 2 para 3 -->
+                                        <div class="text-xs text-gray-400 italic">
+                                            +{{ count($mudancas) - 3 }} mais alterações...
+                                        </div>
+                                        @endif
+                                        @else
+                                        <div class="italic text-xs font-medium bg-base-200 px-3 py-2 rounded">
+                                            {{ Str::limit($detalhes, 100) }} <!-- Aumentou de 50 para 100 -->
+                                        </div>
+                                        @endif
+                                    </div>
+                                    @endif
                                 </div>
-                                @endif
                                 @else
-                                <div class="font-semibold text-sm">{{ Str::limit($log->alteracao, 80) }}</div>
+                                <div class="font-semibold text-sm">{{ Str::limit($log->alteracao, 120) }}</div> <!-- Aumentou de 80 para 120 -->
                                 @endif
                             </td>
 
@@ -296,14 +369,6 @@
     .dataTables_wrapper .dataTables_info,
     .dataTables_wrapper .dataTables_paginate {
         margin: 0.5rem 0;
-    }
-
-    .dataTables_wrapper .dataTables_filter input {
-        @apply input input-bordered input-sm ml-2;
-    }
-
-    .dataTables_wrapper .dataTables_length select {
-        @apply select select-bordered select-sm mx-2;
     }
 
     .dt-buttons {

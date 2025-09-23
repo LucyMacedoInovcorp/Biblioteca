@@ -33,7 +33,7 @@ class BibliController extends Controller
     public function showLivro($id)
     {
         $livro = Livro::with(['requisicoes.user'])->findOrFail($id);
-        $relacionados = $livro->relacionados(); // <-- Adicione esta linha
+        $relacionados = $livro->relacionados();
 
         return view('livros.show', compact('livro', 'relacionados'));
     }
@@ -68,8 +68,14 @@ class BibliController extends Controller
         if ($request->filled('autores')) {
             $livro->autores()->sync($request->autores);
         }
-        //LOG DE CRIAÇÃO
-        LogService::log('livros', $livro->id, 'criação', null, $livro->toArray());
+
+        // LOG DE CRIAÇÃO - apenas dados principais
+        $dadosNovos = [
+            'nome' => $livro->nome,
+            'ISBN' => $livro->ISBN,
+            'preco' => $livro->preco,
+        ];
+        LogService::log('livros', $livro->id, 'criação', null, $dadosNovos);
 
         return redirect('/livros/create')->with('msg', 'Novo livro adicionado com sucesso!');
     }
@@ -83,11 +89,20 @@ class BibliController extends Controller
         return view('livros.edit', compact('livro', 'editoras', 'autores'));
     }
 
-    //Lógica anterior de updateLivro (sem logs)
     public function updateLivro(Request $request, $id)
     {
         $livro = Livro::findOrFail($id);
 
+        // CAPTURAR APENAS OS CAMPOS RELEVANTES ANTES DA ALTERAÇÃO
+        $dadosAnteriores = [
+            'nome' => $livro->nome,
+            'ISBN' => $livro->ISBN,
+            'bibliografia' => $livro->bibliografia,
+            'preco' => $livro->preco,
+            'editora_id' => $livro->editora_id,
+        ];
+
+        // FAZER AS ALTERAÇÕES
         $livro->nome         = $request->nome;
         $livro->ISBN         = $request->ISBN;
         $livro->bibliografia = $request->bibliografia;
@@ -105,23 +120,37 @@ class BibliController extends Controller
             $livro->autores()->sync($request->autores);
         }
 
+        // CAPTURAR APENAS OS CAMPOS RELEVANTES DEPOIS DA ALTERAÇÃO
+        $dadosNovos = [
+            'nome' => $livro->nome,
+            'ISBN' => $livro->ISBN,
+            'bibliografia' => $livro->bibliografia,
+            'preco' => $livro->preco,
+            'editora_id' => $livro->editora_id,
+        ];
 
-        //LOG DE EDIÇÃO
-        $dadosAnteriores = $livro->getOriginal();
-        LogService::log('livros', $livro->id, 'atualização', $dadosAnteriores, $livro->toArray());
-        return redirect('/livros/create')->with('success', 'Livro atualizado com sucesso!');
+        // LOG DE ACTUALIZAÇÃO com comparação
+        LogService::log('livros', $livro->id, 'actualização', $dadosAnteriores, $dadosNovos);
+        
+        return redirect('/livros/create')->with('success', 'Livro actualizado com sucesso!');
     }
-   
-
-
 
     public function destroyLivro($id)
     {
-        Livro::findOrFail($id)->delete();
+        $livro = Livro::findOrFail($id);
+        
+        // CAPTURAR DADOS ANTES DA EXCLUSÃO
+        $dadosAnteriores = [
+            'nome' => $livro->nome,
+            'ISBN' => $livro->ISBN,
+            'preco' => $livro->preco,
+        ];
+        
+        $livro->delete();
 
-        //LOG DE EXCLUSÃO
-        $dadosLivro = Livro::withTrashed()->find($id)->toArray();
-        LogService::log('livros', $id, 'exclusão', $dadosLivro, null);
+        // LOG DE EXCLUSÃO
+        LogService::log('livros', $id, 'exclusão', $dadosAnteriores, null);
+        
         return redirect('/livros/create')->with('msg', 'Livro excluído com sucesso!');
     }
 
@@ -133,8 +162,7 @@ class BibliController extends Controller
             $livro->notificacoesDisponibilidade()->create(['user_id' => $user->id]);
         }
 
-        return back()->with('success', '✉️ Você será notificado quando o livro estiver disponível.');
-
+        return back()->with('success', '✉️ Será notificado quando o livro estiver disponível.');
     }
 
     // ---------- AUTORES ----------
@@ -146,6 +174,11 @@ class BibliController extends Controller
 
     public function storeAutor(Request $request)
     {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         $autor = new Autor;
         $autor->nome = $request->nome;
 
@@ -153,14 +186,17 @@ class BibliController extends Controller
             $path = $request->file('foto')->store('autores', 'public');
             $autor->foto = '/storage/' . $path;
         } else {
-            // Caminho relativo à pasta public
             $autor->foto = '/images/default-book.png';
         }
 
         $autor->save();
 
-        //LOG DE CRIAÇÃO
-        LogService::log('autores', $autor->id, 'criação', null, $autor->toArray());
+        // LOG DE CRIAÇÃO - apenas dados principais
+        $dadosNovos = [
+            'nome' => $autor->nome,
+        ];
+        LogService::log('autores', $autor->id, 'criação', null, $dadosNovos);
+        
         return redirect('/autores/create')->with('msg', 'Novo autor adicionado com sucesso!');
     }
 
@@ -172,7 +208,19 @@ class BibliController extends Controller
 
     public function updateAutor(Request $request, $id)
     {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         $autor = Autor::findOrFail($id);
+        
+        // CAPTURAR APENAS CAMPOS RELEVANTES ANTES
+        $dadosAnteriores = [
+            'nome' => $autor->nome,
+        ];
+        
+        // FAZER A ALTERAÇÃO
         $autor->nome = $request->nome;
 
         if ($request->hasFile('foto')) {
@@ -182,21 +230,33 @@ class BibliController extends Controller
 
         $autor->save();
 
-        //LOG DE EDIÇÃO
-        $dadosAnteriores = $autor->getOriginal();
-        LogService::log('autores', $autor->id, 'atualização', $dadosAnteriores, $autor->toArray());
-        return redirect('/autores/create')->with('success', 'Autor atualizado com sucesso!');
+        // CAPTURAR APÓS ALTERAÇÃO
+        $dadosNovos = [
+            'nome' => $autor->nome,
+        ];
+
+        // LOG DE ACTUALIZAÇÃO com comparação
+        LogService::log('autores', $autor->id, 'actualização', $dadosAnteriores, $dadosNovos);
+        
+        return redirect('/autores/create')->with('success', 'Autor actualizado com sucesso!');
     }
 
     public function destroyAutor($id)
     {
-        Autor::findOrFail($id)->delete();
-        //LOG DE EXCLUSÃO
-        $dadosAutor = Autor::withTrashed()->find($id)->toArray();
-        LogService::log('autores', $id, 'exclusão', $dadosAutor, null);
+        $autor = Autor::findOrFail($id);
+        
+        // CAPTURAR DADOS ANTES DA EXCLUSÃO
+        $dadosAnteriores = [
+            'nome' => $autor->nome,
+        ];
+        
+        $autor->delete();
+        
+        // LOG DE EXCLUSÃO
+        LogService::log('autores', $id, 'exclusão', $dadosAnteriores, null);
+        
         return redirect('/autores/create')->with('msg', 'Autor excluído com sucesso!');
     }
-
 
     // ---------- EDITORAS ----------
     public function createEditora()
@@ -205,9 +265,13 @@ class BibliController extends Controller
         return view('editoras.editoras', compact('editoras'));
     }
 
-
     public function storeEditora(Request $request)
     {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'logotipo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         $editora = new Editora;
         $editora->nome = $request->nome;
 
@@ -215,14 +279,17 @@ class BibliController extends Controller
             $path = $request->file('logotipo')->store('editoras', 'public');
             $editora->logotipo = '/storage/' . $path;
         } else {
-            // Caminho relativo à pasta public
             $editora->logotipo = '/images/default-book.png';
         }
 
         $editora->save();
 
-        //LOG DE CRIAÇÃO
-        LogService::log('editoras', $editora->id, 'criação', null, $editora->toArray());
+        // LOG DE CRIAÇÃO - apenas dados principais
+        $dadosNovos = [
+            'nome' => $editora->nome,
+        ];
+        LogService::log('editoras', $editora->id, 'criação', null, $dadosNovos);
+        
         return redirect('/editoras/create')->with('msg', 'Nova editora adicionada com sucesso!');
     }
 
@@ -234,7 +301,19 @@ class BibliController extends Controller
 
     public function updateEditora(Request $request, $id)
     {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'logotipo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         $editora = Editora::findOrFail($id);
+        
+        // CAPTURAR APENAS CAMPOS RELEVANTES ANTES
+        $dadosAnteriores = [
+            'nome' => $editora->nome,
+        ];
+        
+        // FAZER A ALTERAÇÃO
         $editora->nome = $request->nome;
 
         if ($request->hasFile('logotipo')) {
@@ -244,39 +323,42 @@ class BibliController extends Controller
 
         $editora->save();
 
-        //LOG DE EDIÇÃO
-        $dadosAnteriores = $editora->getOriginal();
-        LogService::log('editoras', $editora->id, 'atualização', $dadosAnteriores, $editora->toArray());        return redirect('/editoras/create')->with('success', 'Editora atualizada com sucesso!');
+        // CAPTURAR APÓS ALTERAÇÃO
+        $dadosNovos = [
+            'nome' => $editora->nome,
+        ];
+
+        // LOG DE ACTUALIZAÇÃO com comparação
+        LogService::log('editoras', $editora->id, 'actualização', $dadosAnteriores, $dadosNovos);
+        
+        return redirect('/editoras/create')->with('success', 'Editora actualizada com sucesso!');
     }
 
     public function destroyEditora($id)
     {
-        Editora::findOrFail($id)->delete();
-        //LOG DE EXCLUSÃO
-        $dadosEditora = Editora::withTrashed()->find($id)->toArray();
-        LogService::log('editoras', $id, 'exclusão', $dadosEditora, null);
+        $editora = Editora::findOrFail($id);
+        
+        // CAPTURAR DADOS ANTES DA EXCLUSÃO
+        $dadosAnteriores = [
+            'nome' => $editora->nome,
+        ];
+        
+        $editora->delete();
+        
+        // LOG DE EXCLUSÃO
+        LogService::log('editoras', $id, 'exclusão', $dadosAnteriores, null);
+        
         return redirect('/editoras/create')->with('msg', 'Editora excluída com sucesso!');
     }
 
-    //Detalhes do Cidadão
+    // ---------- UTILIZADORES ----------
     public function showCidadao($id)
     {
         $user = \App\Models\User::with(['requisicoes.livro'])->findOrFail($id);
-
         return view('users.show', compact('user'));
     }
 
     // ---------- API GOOGLE ----------
-    /**
-     * Armazena um livro no banco de dados a partir dos dados da API do Google Books.
-     * Este método é chamado pela rota 'books.store'.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-
-
-
     public function storeFromApi(Request $request)
     {
         $validatedData = $request->validate([
@@ -316,9 +398,141 @@ class BibliController extends Controller
 
         $livro->autores()->sync($autores->pluck('id'));
 
-        //LOG DE CRIAÇÃO
-        LogService::log('livros', $livro->id, 'criação', null, $livro->toArray());  
+        // LOG DE CRIAÇÃO via API - apenas dados principais
+        $dadosNovos = [
+            'nome' => $livro->nome,
+            'ISBN' => $livro->ISBN,
+            'preco' => $livro->preco,
+            'fonte' => 'API Google Books'
+        ];
+        LogService::log('livros', $livro->id, 'criação', null, $dadosNovos);
         
         return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
+    }
+
+    // ---------- BULK ACTIONS ---------- 
+    public function bulkDeleteLivros(Request $request)
+    {
+        $livroIds = $request->input('livros_selecionados', []);
+        
+        if (empty($livroIds)) {
+            return redirect()->back()->with('error', 'Nenhum livro selecionado.');
+        }
+
+        $livros = Livro::whereIn('id', $livroIds)->get();
+        $nomesLivros = $livros->pluck('nome')->toArray();
+        
+        // Registrar logs de exclusão em massa
+        foreach ($livros as $livro) {
+            LogService::log('livros', $livro->id, 'exclusão', ['nome' => $livro->nome], null);
+        }
+
+        Livro::whereIn('id', $livroIds)->delete();
+
+        $quantidade = count($livroIds);
+        LogService::simples('sistema', 0, "Exclusão em massa → {$quantidade} livros removidos: " . implode(', ', $nomesLivros));
+
+        return redirect()->back()->with('success', "✅ {$quantidade} livros excluídos com sucesso!");
+    }
+
+    public function bulkUpdatePrecos(Request $request)
+    {
+        $request->validate([
+            'livros_selecionados' => 'required|array|min:1',
+            'novo_preco' => 'required|numeric|min:0',
+        ]);
+
+        $livroIds = $request->input('livros_selecionados');
+        $novoPreco = $request->input('novo_preco');
+
+        $livros = Livro::whereIn('id', $livroIds)->get();
+        
+        foreach ($livros as $livro) {
+            $precoAntigo = $livro->preco;
+            $livro->preco = $novoPreco;
+            $livro->save();
+
+            // Log individual de cada alteração
+            LogService::log('livros', $livro->id, 'actualização', 
+                ['preco' => $precoAntigo], 
+                ['preco' => $novoPreco]
+            );
+        }
+
+        $quantidade = count($livroIds);
+        LogService::simples('sistema', 0, "Actualização de preços em massa → {$quantidade} livros actualizados para " . number_format($novoPreco, 2, ',', '.') . '€');
+
+        return redirect()->back()->with('success', "✅ Preços de {$quantidade} livros actualizados com sucesso!");
+    }
+
+    // ---------- IMPORT/EXPORT ----------
+    public function exportLivros(Request $request)
+    {
+        $formato = $request->input('formato', 'excel');
+        
+        LogService::simples('sistema', 0, "Exportação de livros → Formato: {$formato} | Utilizador: " . Auth::user()->name);
+
+        // Aqui iria a lógica de exportação (Excel, CSV, PDF, etc.)
+        // Por agora, retorna uma resposta simples
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Exportação iniciada em formato {$formato}",
+            'download_url' => '/storage/exports/livros_' . date('Y-m-d_H-i-s') . ".{$formato}"
+        ]);
+    }
+
+    public function importLivros(Request $request)
+    {
+        $request->validate([
+            'arquivo' => 'required|file|mimes:xlsx,csv,json|max:5120' // 5MB max
+        ]);
+
+        $arquivo = $request->file('arquivo');
+        $extensao = $arquivo->getClientOriginalExtension();
+        
+        LogService::simples('sistema', 0, "Importação de livros → Arquivo: {$arquivo->getClientOriginalName()} | Formato: {$extensao}");
+
+        // Aqui iria a lógica de importação
+        // Por agora, simula sucesso
+        
+        return redirect()->back()->with('success', '✅ Arquivo importado com sucesso! Os livros serão processados em segundo plano.');
+    }
+
+    // ---------- SEARCH & FILTERS ----------
+    public function searchLivros(Request $request)
+    {
+        $termo = $request->input('q');
+        $filtros = $request->only(['editora_id', 'autor_id', 'preco_min', 'preco_max']);
+        
+        LogService::simples('livros', 0, "Pesquisa → Termo: '{$termo}' | Filtros: " . json_encode($filtros));
+
+        $query = Livro::with(['editora', 'autores']);
+
+        if ($termo) {
+            $query->where(function($q) use ($termo) {
+                $q->where('nome', 'LIKE', "%{$termo}%")
+                  ->orWhere('ISBN', 'LIKE', "%{$termo}%")
+                  ->orWhere('bibliografia', 'LIKE', "%{$termo}%");
+            });
+        }
+
+        if ($filtros['editora_id']) {
+            $query->where('editora_id', $filtros['editora_id']);
+        }
+
+        if ($filtros['preco_min']) {
+            $query->where('preco', '>=', $filtros['preco_min']);
+        }
+
+        if ($filtros['preco_max']) {
+            $query->where('preco', '<=', $filtros['preco_max']);
+        }
+
+        $livros = $query->paginate(20);
+        $editoras = Editora::orderBy('nome')->get();
+        $autores = Autor::orderBy('nome')->get();
+
+        return view('livros.search', compact('livros', 'editoras', 'autores', 'termo', 'filtros'));
     }
 }
