@@ -113,6 +113,11 @@ Route::get('/requisicoes', [RequisicaoController::class, 'index'])->name('requis
 Route::post('/requisicoes/{id}/confirmar', [RequisicaoController::class, 'confirmarRececao'])
     ->name('requisicoes.confirmar');
 
+// Rota para criar requisição via API/JSON (para os testes)
+Route::post('/requisicoes', [RequisicaoController::class, 'storeJson'])
+    ->middleware('auth')
+    ->name('requisicoes.store.json');
+
 /* --------------------DETALHE DOS CIDADÃOS--------------------*/
   Route::get('/users/{id}', [BibliController::class, 'showCidadao'])->name('users.show');
 

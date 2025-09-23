@@ -20,6 +20,12 @@ class Livro extends Model
         'imagemcapa',
         'stripe_product_id',
         'stripe_price_id',
+        'estoque',
+    ];
+
+    protected $casts = [
+        'preco' => 'decimal:2',
+        'estoque' => 'integer'
     ];
 
     
@@ -44,7 +50,7 @@ class Livro extends Model
 
     public function getDisponivelAttribute()
     {
-        return !$this->requisicoes()->where('ativo', true)->exists();
+        return !$this->requisicoes()->where('ativo', true)->exists() && $this->temEstoque();
     }
 
     // Relação com Avaliações
@@ -66,5 +72,67 @@ class Livro extends Model
             ->whereRaw("MATCH(bibliografia) AGAINST(? IN NATURAL LANGUAGE MODE)", [$this->bibliografia])
             ->limit($limit)
             ->get();
+    }
+
+    /*--------------------ESTOQUE--------------------*/
+    
+    /**
+     * Verifica se o livro tem estoque disponível
+     *
+     * @param int $quantidade Quantidade desejada (padrão: 1)
+     * @return bool
+     */
+    public function temEstoque(int $quantidade = 1): bool
+    {
+        return $this->estoque >= $quantidade;
+    }
+
+    /**
+     * Reduz o estoque do livro
+     *
+     * @param int $quantidade Quantidade a reduzir (padrão: 1)
+     * @return bool Sucesso da operação
+     */
+    public function reduzirEstoque(int $quantidade = 1): bool
+    {
+        if (!$this->temEstoque($quantidade)) {
+            return false;
+        }
+
+        $this->decrement('estoque', $quantidade);
+        return true;
+    }
+
+    /**
+     * Aumenta o estoque do livro
+     *
+     * @param int $quantidade Quantidade a adicionar (padrão: 1)
+     * @return bool
+     */
+    public function adicionarEstoque(int $quantidade = 1): bool
+    {
+        $this->increment('estoque', $quantidade);
+        return true;
+    }
+
+    /**
+     * Verifica se o livro está em falta (sem estoque)
+     *
+     * @return bool
+     */
+    public function emFalta(): bool
+    {
+        return $this->estoque <= 0;
+    }
+
+    /**
+     * Verifica se o estoque está baixo (menos que o limite especificado)
+     *
+     * @param int $limite Limite para considerar estoque baixo (padrão: 5)
+     * @return bool
+     */
+    public function estoqueBaixo(int $limite = 5): bool
+    {
+        return $this->estoque > 0 && $this->estoque <= $limite;
     }
 }

@@ -26,6 +26,7 @@ class LivroFactory extends Factory
             'imagemcapa' => '/images/default-book.png',
             'disponivel' => true,
             'editora_id' => Editora::factory(), // Cria automaticamente uma editora
+            'estoque' => $this->faker->numberBetween(0, 50), // Estoque entre 0 e 50
         ];
     }
 
