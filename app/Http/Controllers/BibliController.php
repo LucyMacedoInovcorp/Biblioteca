@@ -180,7 +180,7 @@ class BibliController extends Controller
         // LOG DE EXCLUSÃO
         LogService::log('livros', $id, 'exclusão', $dadosAnteriores, null);
 
-        return redirect('/livros/create')->with('msg', 'Livro excluído com sucesso!');
+        return redirect('/livros/create')->with('success', 'Livro adicionado com sucesso a partir da API!');
     }
 
     public function notificarDisponibilidade(Request $request, Livro $livro)
@@ -460,7 +460,7 @@ class BibliController extends Controller
         ];
         LogService::log('livros', $livro->id, 'criação', null, $dadosNovos);
 
-        return redirect('/livros/create')->with('msg', 'Livro adicionado com sucesso a partir da API!');
+        return redirect('/livros/create')->with('success', 'Novo livro adicionado com sucesso!');
     }
 
     // ---------- BULK ACTIONS ---------- 
