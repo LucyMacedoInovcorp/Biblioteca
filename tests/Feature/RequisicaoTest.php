@@ -87,7 +87,7 @@ describe('RequisicaoController', function () {
         $response = $this->post("/requisicoes/{$requisicao->id}/confirmar");
 
         $response->assertRedirect();
-        $response->assertSessionHas('success', '✅ Devolução confirmada!');
+        $response->assertSessionHas('success', '✅ Devolução confirmada e estoque atualizado!');
 
         // 3.3 ---> Verificar se a requisição foi atualizada corretamente.
         $requisicao->refresh();

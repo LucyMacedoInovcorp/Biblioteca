@@ -25,18 +25,18 @@ class RequisicaoController extends Controller
         }
 
         $user = Auth::user();
-
         if ($user->requisicoes()->where('ativo', true)->count() >= 3) {
             return redirect('/livros/create')->withErrors(['error' => '❌ Você já tem 3 livros ativos requisitados.']);
         }
 
-        // Verificar se há estoque disponível
-        if (!$livro->temEstoque()) {
-            return redirect('/livros/create')->withErrors(['error' => '❌ Este livro não possui estoque disponível.']);
-        }
-
+        // ALTERAÇÃO: Verificar primeiro se já está requisitado por outro usuário
         if ($livro->requisicoes()->where('ativo', true)->exists()) {
             return redirect('/livros/create')->withErrors(['error' => '❌ Este livro já está requisitado por outro usuário.']);
+        }
+
+        // Depois verificar se há estoque disponível
+        if (!$livro->temEstoque()) {
+            return redirect('/livros/create')->withErrors(['error' => '❌ Este livro não possui estoque disponível.']);
         }
 
         // Reduzir estoque
@@ -202,6 +202,10 @@ class RequisicaoController extends Controller
         if ($req->livro) {
             $quantidade = $req->quantidade ?? 1;
             $req->livro->adicionarEstoque($quantidade);
+
+            // ALTERAÇÃO: Marcar livro como disponível
+            $req->livro->disponivel = 1;
+            $req->livro->save();
         }
 
         /*--------------LOG DE DADOS APÓS DEVOLUÇÃO----------------*/
@@ -260,6 +264,10 @@ class RequisicaoController extends Controller
         if ($req->livro) {
             $quantidade = $req->quantidade ?? 1;
             $req->livro->adicionarEstoque($quantidade);
+
+            // ALTERAÇÃO: Marcar livro como disponível também no cancelamento
+            $req->livro->disponivel = 1;
+            $req->livro->save();
         }
 
         // Marcar requisição como cancelada
