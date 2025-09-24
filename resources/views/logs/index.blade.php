@@ -11,12 +11,13 @@
             <span class="badge badge-primary badge-lg">{{ $logs->total() }}</span>
         </h2>
 
+
         <!-- Filtros compactos no topo -->
         <div class="flex gap-2 flex-wrap">
-            <select id="filtroModulo" class="select select-sm select-bordered">
-                <option value="">📂 Módulos</option>
+            <select id="filtroModulo" class="select select-sm select-bordered text-xs min-w-32">
+                <option value="" class="text-xs">📂 Módulos</option>
                 @foreach($modulos as $modulo)
-                <option value="{{ $modulo }}" {{ request('modulo') == $modulo ? 'selected' : '' }}>
+                <option value="{{ $modulo }}" class="text-xs" {{ request('modulo') == $modulo ? 'selected' : '' }}>
                     @switch($modulo)
                     @case('livros') 📚 @break
                     @case('autores') 👨‍💼 @break
@@ -30,16 +31,20 @@
                 @endforeach
             </select>
 
-            <select id="filtroUsuario" class="select select-sm select-bordered">
-                <option value="">👥 Utilizadores</option>
+            <select id="filtroUsuario" class="select select-sm select-bordered text-xs min-w-40">
+                <option value="" class="text-xs">👥 Utilizadores</option>
                 @foreach($usuarios as $usuario)
-                <option value="{{ $usuario->id }}" {{ request('user_id') == $usuario->id ? 'selected' : '' }}>
+                <option value="{{ $usuario->id }}" class="text-xs" {{ request('user_id') == $usuario->id ? 'selected' : '' }}>
                     {{ $usuario->name }} {{ $usuario->is_admin ? '👑' : '' }}
                 </option>
                 @endforeach
             </select>
         </div>
     </div>
+
+
+
+
 
     <!-- Tabela -->
     <div class="card bg-base-100 shadow-md">
