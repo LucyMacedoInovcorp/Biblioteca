@@ -106,94 +106,13 @@
                                 @endif
                             </td>
 
-                            <!-- Alteração -->
+
+
+                           <!-- Alteração -->
                             <td class="max-w-lg">
-                                @if(Str::contains($log->alteracao, '→'))
-                                @php
-                                $parts = explode(' → ', $log->alteracao, 2);
-                                $tipoAcao = trim($parts[0] ?? '');
-                                $detalhes = trim($parts[1] ?? '');
-                                @endphp
-
-                                <div class="space-y-1">
-                                    <!-- Tipo de acção -->
-                                    <div class="flex items-center gap-1">
-                                        @switch($tipoAcao)
-                                        @case('Criação')
-                                        <span class="badge badge-success badge-xs">➕</span>
-                                        <span class="text-success text-sm">{{ $tipoAcao }}</span>
-                                        @break
-                                        @case('Actualização')
-                                        <span class="badge badge-warning badge-xs">✏️</span>
-                                        <span class="text-warning text-sm">{{ $tipoAcao }}</span>
-                                        @break
-                                        @case('Exclusão')
-                                        <span class="badge badge-error badge-xs">🗑️</span>
-                                        <span class="text-error text-sm">{{ $tipoAcao }}</span>
-                                        @break
-                                        @default
-                                        <span class="badge badge-neutral badge-xs">ℹ️</span>
-                                        <span class="text-neutral text-sm">{{ $tipoAcao }}</span>
-                                        @endswitch
-                                    </div>
-
-                                    <!-- Detalhes -->
-                                    @if($detalhes)
-                                    <div class="text-xs text-gray-600">
-                                        @if(Str::contains($detalhes, ' | '))
-                                        @php
-                                        $mudancas = explode(' | ', $detalhes);
-                                        @endphp
-                                        @foreach(array_slice($mudancas, 0, 3) as $mudanca)
-                                        <div class="bg-base-200 px-3 py-2 rounded text-xs mb-2">
-                                            @if(Str::contains($mudanca, ' → de:') && Str::contains($mudanca, 'para:'))
-                                            @php
-                                            if (preg_match('/(.+?) → de: (.+?) para: (.+)/', $mudanca, $matches)) {
-                                            $campo = trim($matches[1]);
-                                            $antes = trim($matches[2]);
-                                            $depois = trim($matches[3]);
-                                            } else {
-                                            $campo = $mudanca;
-                                            $antes = '';
-                                            $depois = '';
-                                            }
-                                            @endphp
-                                            @if($campo && $antes && $depois)
-                                            <div class="font-medium text-primary text-xs mb-2">📝 {{ $campo }}</div>
-                                            <div class="grid grid-cols-1 gap-2">
-                                                <div class="text-red-600 text-xs flex items-start gap-1">
-                                                    <span class="flex-shrink-0">❌ Antes:</span>
-                                                    <span class="break-words" title="{{ $antes }}">{{ Str::limit($antes, 60) }}</span>
-                                                </div>
-                                                <div class="text-green-600 text-xs flex items-start gap-1">
-                                                    <span class="flex-shrink-0">✅ Depois:</span>
-                                                    <span class="break-words" title="{{ $depois }}">{{ Str::limit($depois, 60) }}</span>
-                                                </div>
-                                            </div>
-                                            @else
-                                            <div class="text-xs">{{ Str::limit($mudanca, 80) }}</div>
-                                            @endif
-                                            @else
-                                            <div class="text-xs">{{ Str::limit($mudanca, 80) }}</div>
-                                            @endif
-                                        </div>
-                                        @endforeach
-                                        @if(count($mudancas) > 3)
-                                        <div class="text-xs text-gray-400 italic">
-                                            +{{ count($mudancas) - 3 }} mais alterações...
-                                        </div>
-                                        @endif
-                                        @else
-                                        <div class="italic text-xs font-medium bg-base-200 px-3 py-2 rounded">
-                                            {{ Str::limit($detalhes, 100) }}
-                                        </div>
-                                        @endif
-                                    </div>
-                                    @endif
+                                <div class="text-sm text-gray-700 break-words">
+                                    {{ Str::limit($log->alteracao, 150) }}
                                 </div>
-                                @else
-                                <div class="text-sm">{{ Str::limit($log->alteracao, 120) }}</div>
-                                @endif
                             </td>
 
                             <!-- IP -->

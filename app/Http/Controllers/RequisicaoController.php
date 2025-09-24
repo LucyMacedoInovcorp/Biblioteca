@@ -56,7 +56,8 @@ class RequisicaoController extends Controller
             'livro' => $livro->nome,
             'usuario' => $user->name,
             'quantidade' => 1,
-            'estoque_restante' => $livro->fresh()->estoque
+            'estoque_restante' => $livro->fresh()->estoque,
+            '_descricao_personalizada' => "Requisição efetuada: \"{$livro->nome}\""
         ]);
 
         $admins = User::where('is_admin', true)->pluck('email')->toArray();
@@ -122,7 +123,8 @@ class RequisicaoController extends Controller
             'usuario' => $user->name,
             'quantidade' => $request->quantidade,
             'estoque_restante' => $livro->fresh()->estoque,
-            'via' => 'API'
+            'via' => 'API',
+            '_descricao_personalizada' => "Requisição efetuada: \"{$livro->nome}\" (via Google API)"
         ]);
 
 

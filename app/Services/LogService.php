@@ -8,12 +8,13 @@ use Illuminate\Support\Facades\Auth;
 
 
 /*------------------------INCLUSÃO, ALTERAÇÃO E EXCLUSÃO DE REGISTOS------------------------*/
+
 class LogService
 {
     public static function log($modulo, $objetoId, $acao, $dadosAnteriores = null, $dadosNovos = null)
     {
         $alteracao = self::formatarAlteracao($acao, $dadosAnteriores, $dadosNovos);
-        
+
         Log::create([
             'data_hora' => now(),
             'user_id' => Auth::id(),
@@ -27,26 +28,31 @@ class LogService
 
     private static function formatarAlteracao($acao, $dadosAnteriores, $dadosNovos)
     {
+        // VERIFICA SE HÁ DESCRIÇÃO PERSONALIZADA
+        if (!is_null($dadosNovos) && isset($dadosNovos['_descricao_personalizada'])) {
+            return $dadosNovos['_descricao_personalizada'];
+        }
+
         // Se for criação
         if (is_null($dadosAnteriores) && !is_null($dadosNovos)) {
             $nomeObjeto = $dadosNovos['nome'] ?? $dadosNovos['name'] ?? $dadosNovos['title'] ?? 'registo';
             return "Criação → {$nomeObjeto}";
         }
-        
+
         // Se for exclusão
         if (!is_null($dadosAnteriores) && is_null($dadosNovos)) {
             $nomeObjeto = $dadosAnteriores['nome'] ?? $dadosAnteriores['name'] ?? $dadosAnteriores['title'] ?? 'registo';
             return "Exclusão → {$nomeObjeto}";
         }
-        
+
         // Se for actualização com comparação
         if (!is_null($dadosAnteriores) && !is_null($dadosNovos)) {
             $alteracoes = [];
-            
+
             // CAMPOS A IGNORAR (timestamps automáticos e campos internos)
             $camposIgnorar = [
                 'created_at',
-                'updated_at', 
+                'updated_at',
                 'deleted_at',
                 'id',
                 'pivot',
@@ -54,11 +60,11 @@ class LogService
                 'email_verified_at',
                 'laravel_session'
             ];
-            
+
             // Campos traduzidos para português
             $camposTraducao = [
                 'nome' => 'Nome',
-                'name' => 'Nome', 
+                'name' => 'Nome',
                 'title' => 'Título',
                 'ISBN' => 'ISBN',
                 'preco' => 'Preço',
@@ -80,43 +86,43 @@ class LogService
                 'telefone' => 'Telefone',
                 'morada' => 'Morada'
             ];
-            
+
             // FILTRAR E COMPARAR APENAS OS CAMPOS DESEJADOS
             foreach ($dadosNovos as $campo => $valorNovo) {
                 // PULAR CAMPOS QUE DEVEM SER IGNORADOS
                 if (in_array($campo, $camposIgnorar)) {
                     continue;
                 }
-                
+
                 // PULAR CAMPOS QUE COMEÇAM COM UNDERSCORE (internos)
                 if (strpos($campo, '_') === 0) {
                     continue;
                 }
-                
+
                 if (array_key_exists($campo, $dadosAnteriores)) {
                     $valorAntigo = $dadosAnteriores[$campo];
-                    
+
                     // Só regista se houve mudança real E não são timestamps
                     if ($valorAntigo != $valorNovo && !self::isTimestamp($valorAntigo) && !self::isTimestamp($valorNovo)) {
                         $campoNome = $camposTraducao[$campo] ?? ucfirst(str_replace('_', ' ', $campo));
-                        
+
                         // Tratamento especial para diferentes tipos de campos
                         switch ($campo) {
                             case 'is_admin':
                                 $valorAntigo = $valorAntigo ? 'Administrador' : 'Utilizador';
                                 $valorNovo = $valorNovo ? 'Administrador' : 'Utilizador';
                                 break;
-                                
+
                             case 'preco':
                                 $valorAntigo = number_format((float)$valorAntigo, 2, ',', '.') . '€';
                                 $valorNovo = number_format((float)$valorNovo, 2, ',', '.') . '€';
                                 break;
-                                
+
                             case 'password':
                                 $valorAntigo = '••••••••';
                                 $valorNovo = '••••••••';
                                 break;
-                                
+
                             case 'data_requisicao':
                             case 'data_devolucao':
                                 if ($valorAntigo) {
@@ -126,7 +132,7 @@ class LogService
                                     $valorNovo = date('d/m/Y', strtotime($valorNovo));
                                 }
                                 break;
-                                
+
                             case 'editora_id':
                                 // Converter ID da editora para nome
                                 try {
@@ -139,7 +145,7 @@ class LogService
                                     $valorNovo = "ID: {$valorNovo}";
                                 }
                                 break;
-                                
+
                             case 'autor_id':
                                 // Converter ID do autor para nome
                                 try {
@@ -152,7 +158,7 @@ class LogService
                                     $valorNovo = "ID: {$valorNovo}";
                                 }
                                 break;
-                                
+
                             case 'user_id':
                                 // Converter ID do utilizador para nome
                                 try {
@@ -174,23 +180,23 @@ class LogService
                         if (in_array($campo, ['bibliografia', 'description']) && strlen($valorNovo) > 50) {
                             $valorNovo = substr($valorNovo, 0, 47) . '...';
                         }
-                        
+
                         // Proteger valores vazios
                         $valorAntigo = $valorAntigo ?: '(vazio)';
                         $valorNovo = $valorNovo ?: '(vazio)';
-                        
+
                         $alteracoes[] = "{$campoNome} → de: {$valorAntigo} para: {$valorNovo}";
                     }
                 }
             }
-            
+
             if (empty($alteracoes)) {
                 return "Actualização → sem alterações significativas";
             }
-            
+
             return "Actualização → " . implode(' | ', $alteracoes);
         }
-        
+
         // Fallback para acções simples (compatibilidade)
         return ucfirst($acao);
     }
@@ -201,17 +207,17 @@ class LogService
     private static function isTimestamp($valor)
     {
         if (is_null($valor)) return false;
-        
+
         // Verificar se é um timestamp no formato Laravel (YYYY-MM-DD HH:MM:SS)
         if (preg_match('/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}/', $valor)) {
             return true;
         }
-        
+
         // Verificar se é um timestamp Unix
         if (is_numeric($valor) && $valor > 1000000000 && $valor < 2147483647) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -221,32 +227,32 @@ class LogService
     private static function detectarBrowser()
     {
         $userAgent = request()->userAgent();
-        
+
         // Detecção mais precisa dos browsers
         if (preg_match('/Edg\//', $userAgent)) {
             preg_match('/Edg\/([\d.]+)/', $userAgent, $matches);
             $version = $matches[1] ?? 'Desconhecida';
             return "Microsoft Edge {$version}";
         }
-        
+
         if (preg_match('/Chrome\/[\d.]+/', $userAgent) && !preg_match('/Edg\//', $userAgent)) {
             preg_match('/Chrome\/([\d.]+)/', $userAgent, $matches);
             $version = $matches[1] ?? 'Desconhecida';
             return "Google Chrome {$version}";
         }
-        
+
         if (preg_match('/Firefox\/([\d.]+)/', $userAgent)) {
             preg_match('/Firefox\/([\d.]+)/', $userAgent, $matches);
             $version = $matches[1] ?? 'Desconhecida';
             return "Mozilla Firefox {$version}";
         }
-        
+
         if (preg_match('/Safari\//', $userAgent) && !preg_match('/Chrome\//', $userAgent)) {
             preg_match('/Version\/([\d.]+)/', $userAgent, $matches);
             $version = $matches[1] ?? 'Desconhecida';
             return "Safari {$version}";
         }
-        
+
         if (preg_match('/Opera|OPR\//', $userAgent)) {
             if (preg_match('/OPR\/([\d.]+)/', $userAgent, $matches)) {
                 $version = $matches[1] ?? 'Desconhecida';
@@ -254,7 +260,7 @@ class LogService
             }
             return 'Opera';
         }
-        
+
         // Para browsers desconhecidos ou casos especiais
         return substr($userAgent, 0, 100) . (strlen($userAgent) > 100 ? '...' : '');
     }
@@ -265,7 +271,7 @@ class LogService
     private static function detectarSO()
     {
         $userAgent = request()->userAgent();
-        
+
         if (preg_match('/Windows NT 10/', $userAgent)) return 'Windows 10/11';
         if (preg_match('/Windows NT 6.3/', $userAgent)) return 'Windows 8.1';
         if (preg_match('/Windows NT 6.2/', $userAgent)) return 'Windows 8';
@@ -274,7 +280,7 @@ class LogService
         if (preg_match('/Linux/', $userAgent)) return 'Linux';
         if (preg_match('/Android/', $userAgent)) return 'Android';
         if (preg_match('/iPhone|iPad/', $userAgent)) return 'iOS';
-        
+
         return 'Sistema Desconhecido';
     }
 
@@ -349,7 +355,7 @@ class LogService
             if ($dados) {
                 $mensagemCompleta .= ' | Dados: ' . json_encode($dados);
             }
-            
+
             self::simples($modulo, $objetoId, "DEBUG → {$mensagemCompleta}");
         }
     }
@@ -360,12 +366,12 @@ class LogService
     public static function limparLogsAntigos($dias = 90)
     {
         $dataLimite = now()->subDays($dias);
-        
+
         $logsRemovidos = Log::where('data_hora', '<', $dataLimite)->count();
         Log::where('data_hora', '<', $dataLimite)->delete();
-        
+
         self::sistema('sistema', 0, "Limpeza automática → {$logsRemovidos} logs removidos (>$dias dias)");
-        
+
         return $logsRemovidos;
     }
 
@@ -375,7 +381,7 @@ class LogService
     public static function estatisticas($dias = 30)
     {
         $dataInicio = now()->subDays($dias);
-        
+
         return [
             'total_logs' => Log::where('data_hora', '>=', $dataInicio)->count(),
             'por_modulo' => Log::where('data_hora', '>=', $dataInicio)
@@ -397,7 +403,4 @@ class LogService
                 ->get()
         ];
     }
-
-
-    /*------------------------REQUISIÇÃO E DEVOLUÇÃO DE LIVROS------------------------*/
 }
