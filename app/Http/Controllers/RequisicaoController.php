@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Mail\LivroDisponivelMail;
 use Illuminate\Http\JsonResponse;
+use App\Services\LogService;
 
 class RequisicaoController extends Controller
 {
@@ -47,7 +48,15 @@ class RequisicaoController extends Controller
             'user_id'  => $user->id,
             'livro_id' => $livro->id,
             'ativo'    => true,
-            'quantidade' => 1, // Assumindo quantidade padrão 1 para requisições web
+            'quantidade' => 1,
+        ]);
+
+        /*------------------------LOG DA REQUISIÇÃO------------------------*/
+        LogService::log('requisicoes', $requisicao->id, 'criação', null, [
+            'livro' => $livro->nome,
+            'usuario' => $user->name,
+            'quantidade' => 1,
+            'estoque_restante' => $livro->fresh()->estoque
         ]);
 
         $admins = User::where('is_admin', true)->pluck('email')->toArray();
@@ -60,9 +69,7 @@ class RequisicaoController extends Controller
         return redirect('/livros/create')->with('success', '✅ Requisição realizada com sucesso! Um e-mail de confirmação foi enviado.');
     }
 
-    /**
-     * Criar requisição via API/JSON (para os testes)
-     */
+    /*------------------------Criar requisição via API/JSON (para os testes)------------------------*/
     public function storeJson(Request $request): JsonResponse
     {
         $request->validate([
@@ -72,7 +79,7 @@ class RequisicaoController extends Controller
 
         $livro = Livro::findOrFail($request->livro_id);
         $user = Auth::user();
-        
+
         // Verificar autenticação
         if (!$user) {
             return response()->json([
@@ -109,6 +116,17 @@ class RequisicaoController extends Controller
             'ativo' => true,
         ]);
 
+        /*------------------ LOG DA REQUISIÇÃO VIA API ------------------*/
+        LogService::log('requisicoes', $requisicao->id, 'criação', null, [
+            'livro' => $livro->nome,
+            'usuario' => $user->name,
+            'quantidade' => $request->quantidade,
+            'estoque_restante' => $livro->fresh()->estoque,
+            'via' => 'API'
+        ]);
+
+
+
         // Enviar e-mails de notificação
         $admins = User::where('is_admin', true)->pluck('email')->toArray();
 
@@ -120,9 +138,9 @@ class RequisicaoController extends Controller
         return response()->json($requisicao->load(['livro', 'user']), 201);
     }
 
-    /**
-     * Listar requisições do usuário (ou todas, se admin)
-     */
+
+    /*--------------- Listar requisições do usuário (ou todas, se admin) ----------------*/
+
     public function index()
     {
         $user = Auth::user();
@@ -163,22 +181,47 @@ class RequisicaoController extends Controller
     {
         $req = Requisicao::findOrFail($id);
 
+        /*------------------------LOG PARA CAPTURAR DADOS ANTES DA DEVOLUÇÃO------------------------*/
+        $dadosAnteriores = [
+            'livro' => $req->livro->nome,
+            'usuario' => $req->user->name,
+            'quantidade' => $req->quantidade ?? 1,
+            'ativo' => true,
+            'estoque_antes' => $req->livro->estoque
+        ];
+
         $req->data_recepcao = now();
         $req->dias_decorridos = $req->created_at->diffInDays(now());
         $req->ativo = false;
         $req->save();
 
+
         // Retornar estoque ao livro
         if ($req->livro) {
-            $quantidade = $req->quantidade ?? 1; // Usar quantidade da requisição ou 1 como padrão
+            $quantidade = $req->quantidade ?? 1;
             $req->livro->adicionarEstoque($quantidade);
         }
+
+        /*--------------LOG DE DADOS APÓS DEVOLUÇÃO----------------*/
+        $dadosNovos = [
+            'livro' => $req->livro->nome,
+            'usuario' => $req->user->name,
+            'quantidade' => $req->quantidade ?? 1,
+            'ativo' => false,
+            'dias_decorridos' => $req->dias_decorridos,
+            'estoque_depois' => $req->livro->fresh()->estoque,
+            'processado_por' => Auth::user()->name,
+            '_descricao_personalizada' => "Devolução: \"{$req->livro->nome}"
+        ];
+
+        /*--------------LOG DE DEVOLUÇÃO----------------*/
+        LogService::log('requisicoes', $req->id, 'devolução', $dadosAnteriores, $dadosNovos);
 
         // Enviar notificações para usuários na lista de espera
         if ($req->livro) {
             foreach ($req->livro->notificacoesDisponibilidade as $notificacao) {
                 Mail::to($notificacao->user->email)->send(new LivroDisponivelMail($req->livro));
-                $notificacao->delete(); 
+                $notificacao->delete();
             }
         }
 
@@ -191,7 +234,7 @@ class RequisicaoController extends Controller
     public function cancelar($id)
     {
         $req = Requisicao::findOrFail($id);
-        
+
         // Verificar se o usuário pode cancelar esta requisição
         if (!Auth::user()->is_admin && $req->user_id !== Auth::id()) {
             return back()->withErrors(['error' => '❌ Você não tem permissão para cancelar esta requisição.']);
@@ -200,6 +243,16 @@ class RequisicaoController extends Controller
         if (!$req->ativo) {
             return back()->withErrors(['error' => '❌ Esta requisição já foi finalizada.']);
         }
+
+
+        /*------------------------LOG PARA CAPTURAR DADOS ANTES DO CANCELAMENTO------------------------*/
+        $dadosAnteriores = [
+            'livro' => $req->livro->nome,
+            'usuario' => $req->user->name,
+            'quantidade' => $req->quantidade ?? 1,
+            'ativo' => true,
+            'estoque_antes' => $req->livro->estoque
+        ];
 
         // Retornar estoque
         if ($req->livro) {
@@ -212,11 +265,27 @@ class RequisicaoController extends Controller
         $req->data_recepcao = now();
         $req->save();
 
+
+        /*------------------------LOG DE DADOS APÓS CANCELAMENTO------------------------*/
+        $dadosNovos = [
+            'livro' => $req->livro->nome,
+            'usuario' => $req->user->name,
+            'quantidade' => $req->quantidade ?? 1,
+            'ativo' => false,
+            'estoque_depois' => $req->livro->fresh()->estoque,
+            'cancelado_por' => Auth::user()->name,
+            'motivo' => 'Cancelamento manual',
+            '_descricao_personalizada' => "Cancelamento: \"{$req->livro->nome}"
+        ];
+
+        /*------------------------LOG DE CANCELAMENTO------------------------*/
+        LogService::log('requisicoes', $req->id, 'cancelamento', $dadosAnteriores, $dadosNovos);
+
         // Notificar usuários em lista de espera
         if ($req->livro) {
             foreach ($req->livro->notificacoesDisponibilidade as $notificacao) {
                 Mail::to($notificacao->user->email)->send(new LivroDisponivelMail($req->livro));
-                $notificacao->delete(); 
+                $notificacao->delete();
             }
         }
 
